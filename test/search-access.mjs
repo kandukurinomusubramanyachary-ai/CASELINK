@@ -1,0 +1,45 @@
+import { spawn } from 'node:child_process';
+import { createServer } from 'node:net';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import Database from 'better-sqlite3';
+
+await fs.mkdir('.runtime', { recursive: true });
+const dataDir = await fs.mkdtemp(path.resolve('.runtime/search-access-'));
+const port = await new Promise(resolve => { const server = createServer(); server.listen(0, '127.0.0.1', () => { const selected = server.address().port; server.close(() => resolve(selected)); }); });
+const child = spawn(process.execPath, ['--import', 'tsx', 'server/src/index.ts'], { env: { ...process.env, PORT: String(port), CASELINK_DEMO: 'false', CASELINK_DATA_DIR: dataDir }, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+const base = `http://127.0.0.1:${port}`;
+let output = '';
+child.stdout.on('data', value => { output += value; }); child.stderr.on('data', value => { output += value; });
+let db;
+let failures = 0;
+const check = (name, ok) => { console.log(`${ok ? 'PASS' : 'FAIL'} ${name}`); if (!ok) failures++; };
+try {
+  await new Promise((resolve, reject) => { const deadline = setTimeout(() => reject(new Error(`Test server did not start: ${output}`)), 30000); const ready = setInterval(() => { if (output.includes('CaseLink listening')) { clearTimeout(deadline); clearInterval(ready); resolve(); } }, 100); child.once('exit', () => { clearTimeout(deadline); clearInterval(ready); reject(new Error(output)); }); });
+  db = new Database(path.join(dataDir, 'caselink.db'));
+  const actor = db.prepare('SELECT id FROM users WHERE username = ?').get('p.rao');
+  const own = db.prepare("SELECT c.* FROM cases c JOIN institutions i ON i.id = c.institution_id WHERE c.bureau = 'PGRC' AND i.region = 'South' LIMIT 1").get();
+  const foreign = db.prepare("SELECT c.* FROM cases c JOIN institutions i ON i.id = c.institution_id WHERE c.bureau = 'RB' AND i.region = 'South' AND c.id NOT IN (SELECT case_id FROM case_grants WHERE user_id = ? AND revoked_at IS NULL) LIMIT 1").get(actor.id);
+  const insert = db.prepare('INSERT INTO action_events (id,case_id,actor_id,actor_bureau,at,action_type,remarks,version_after,paired_case_id) VALUES (?,?,?,?,?,?,?,?,?)');
+  insert.run('search-test-own-event', own.id, actor.id, 'PGRC', new Date().toISOString(), 'case_updated', 'SEARCH_OWN_SENTINEL_8264', own.version, null);
+  insert.run('search-test-paired-event', own.id, actor.id, 'PGRC', new Date().toISOString(), 'relationship_confirmed', 'SEARCH_PRIVATE_PAIR_SENTINEL_8264', own.version, foreign.id);
+  insert.run('search-test-foreign-event', foreign.id, actor.id, 'RB', new Date().toISOString(), 'transfer_rejected', 'SEARCH_PRIVATE_FOREIGN_SENTINEL_8264', foreign.version, null);
+  const login = await fetch(`${base}/api/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: 'p.rao', password: 'caselink-demo' }) }).then(response => response.json());
+  const headers = { Authorization: `Bearer ${login.token}` };
+  const search = query => fetch(`${base}/api/search?q=${encodeURIComponent(query)}`, { headers }).then(response => response.json());
+  check('Search requires authentication', (await fetch(`${base}/api/search?q=case`)).status === 401);
+  check('Short queries rejected', (await fetch(`${base}/api/search?q=a`, { headers })).status === 422);
+  check('Oversized queries rejected', (await fetch(`${base}/api/search?q=${'a'.repeat(201)}`, { headers })).status === 422);
+  check('Case reference finds a real case', (await search(own.case_number)).results.some(result => result.kind === 'case' && result.id === own.id));
+  check('Authorized event ID is searchable', (await search('search-test-own-event')).results.some(result => result.kind === 'history' && result.id === 'search-test-own-event'));
+  check('Authorized history remarks are searchable', (await search('SEARCH_OWN_SENTINEL_8264')).results.some(result => result.id === 'search-test-own-event'));
+  check('Staff identity finds authorized history', (await search('Priya Rao')).results.some(result => result.kind === 'history'));
+  check('Foreign private remarks never match', (await search('SEARCH_PRIVATE_FOREIGN_SENTINEL_8264')).results.length === 0);
+  check('Foreign private event IDs never match', (await search('search-test-foreign-event')).results.length === 0);
+  check('Paired private remarks never match', (await search('SEARCH_PRIVATE_PAIR_SENTINEL_8264')).results.length === 0);
+  check('Paired private event IDs never match', (await search('search-test-paired-event')).results.length === 0);
+  check('No matches returns a real empty result', (await search('NO_SUCH_RECORD_8264')).results.length === 0);
+  check('Private complaint text never matches', !(await search(foreign.complaint_summary)).results.some(result => result.id === foreign.id));
+  console.log(failures ? `${failures} search-access checks failed.` : 'All search-access checks passed on an isolated test database.');
+} finally { db?.close(); child.kill(); }
+process.exitCode = failures ? 1 : 0;

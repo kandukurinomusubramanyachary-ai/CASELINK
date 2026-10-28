@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101114" />
+    <script>
+      (function () {
+        var choice = 'system';
+        try { var saved = localStorage.getItem('caselink.theme'); if (saved === 'dark' || saved === 'light' || saved === 'system') choice = saved; } catch (_) {}
+        var theme = choice === 'system' ? (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : choice;
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'dark' ? '#101114' : '#e8ebe6');
+      })();
+    </script>
+    <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <meta name="description" content="CaseLink — institution complaint coordination prototype (SIH26264). Synthetic demo data only." />
+    <title>CaseLink · Institution complaint coordination (SIH26264)</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

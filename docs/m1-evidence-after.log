@@ -1,0 +1,8 @@
+# Milestone 1 — access-control evidence
+# Same probe against the fixed build, default configuration (CASELINK_DEMO unset => false), fresh seed, port 8094, 2026-10-27
+
+PROBE 1: self-grant on RB-2026-00027 (RB) HTTP 403; contents readable afterwards: false
+PROBE 2: foreign lead evidence upload HTTP 403
+PROBE 3: granted reviewer upload on RB-2026-00027 HTTP 403 (grant HTTP 200)
+PROBE 4: demo-login without credentials HTTP 403; /api/session demoMode=false; published demo accounts=0
+PROBE 0: unauthenticated GET /api/cases HTTP 401

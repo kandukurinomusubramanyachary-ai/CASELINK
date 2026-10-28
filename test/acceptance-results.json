@@ -1,0 +1,134 @@
+{
+  "base": "http://127.0.0.1:8091",
+  "at": "2026-10-28T06:53:08.409Z",
+  "pass": 21,
+  "total": 21,
+  "results": [
+    {
+      "id": "T01",
+      "name": "Same institution with active cases in RB and PGRC yields one coordination alert listing both cases",
+      "ok": true,
+      "detail": "alert 0480ff35, bureaus PGRC+PGRC+PGRC+PGRC+PGRC+RB+RB+RB+RB+RB, cases 10"
+    },
+    {
+      "id": "T02",
+      "name": "Institution alert appears for unrelated topics; no institution-only duplicate claim",
+      "ok": true,
+      "detail": "alert present=true, duplicate(cert,infra)=false, all suggestions carry >=2 reasons=true"
+    },
+    {
+      "id": "T03",
+      "name": "Identical wording at different institution IDs produces no duplicate relationship",
+      "ok": true,
+      "detail": "kaveri case PGRC-2026-00005 vs vaigai case PGRC-2026-00001: suggestion present=false"
+    },
+    {
+      "id": "T04",
+      "name": "Ambiguous college name stays in triage; no speculative canonical merge",
+      "ok": true,
+      "detail": "triage case PGRC-2026-00009, excluded from overlap=true, suggestions are advisory only=true"
+    },
+    {
+      "id": "T05a",
+      "name": "Cross-bureau case read is denied or fully masked for a bureau officer",
+      "ok": true,
+      "detail": "HTTP 200 (coordination metadata only, complaint text absent)"
+    },
+    {
+      "id": "T05b",
+      "name": "Region scope is enforced for the same bureau",
+      "ok": true,
+      "detail": "HTTP 403 for a West-region case read by a South officer"
+    },
+    {
+      "id": "T05c",
+      "name": "Restricted rows in list responses never carry complaint text",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "T06",
+      "name": "Reviewer links then revokes two cases; both stay intact with recorded reasons and actors",
+      "ok": true,
+      "detail": "suggestion found=true, link HTTP 200, revoke HTTP 200, owners unchanged=true"
+    },
+    {
+      "id": "T07",
+      "name": "Pending, rejected and accepted transfer each keep exactly one owner and are all recorded",
+      "ok": true,
+      "detail": "pending owner PGRC=true, reject kept PGRC=true, accepted owner RB, repeat accept HTTP 409"
+    },
+    {
+      "id": "T08",
+      "name": "No policy means no invented deadline; configured approaching/overdue reminders follow the stored due time",
+      "ok": true,
+      "detail": "no-deadline case RB-2026-00023 (state not_applicable), overdue 4, approaching 4"
+    },
+    {
+      "id": "T09",
+      "name": "Dispose and reopen keep the earlier outcome and original receipt time; alerts follow active state",
+      "ok": true,
+      "detail": "disposed=Disposed, outcome kept in disposition history=true, reopened=Under review, receipt preserved=true, prior disposal event kept=true"
+    },
+    {
+      "id": "T10",
+      "name": "Repeat import or retried mutation creates no duplicate case, transfer or notification",
+      "ok": true,
+      "detail": "idempotent replay same case=true, first commit accepted 1/rejected 1/skipped 1, repeat accepted 0/skipped 2"
+    },
+    {
+      "id": "T11",
+      "name": "Two editors saving the same version: one saves, the stale edit reports a conflict",
+      "ok": true,
+      "detail": "first save 201, stale save 409, version now 2"
+    },
+    {
+      "id": "T12",
+      "name": "Failure during mutation and audit commit rolls back atomically; invalid state change rejected",
+      "ok": true,
+      "detail": "invalid transition HTTP 422, inject=200, injected failure HTTP 500, version 1→1, no partial event=true"
+    },
+    {
+      "id": "S01",
+      "name": "Unauthenticated API read is refused",
+      "ok": true,
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "S02",
+      "name": "A bureau or role claimed in the request body cannot widen scope",
+      "ok": true,
+      "detail": "HTTP 403"
+    },
+    {
+      "id": "S03",
+      "name": "Read-only reviewer sees only granted records and cannot mutate a case",
+      "ok": true,
+      "detail": "read HTTP 403, write HTTP 403"
+    },
+    {
+      "id": "S04",
+      "name": "Attachment download through another case is refused",
+      "ok": true,
+      "detail": "HTTP 404"
+    },
+    {
+      "id": "S05",
+      "name": "CSV export escapes spreadsheet formula-like values and carries snapshot/filter metadata",
+      "ok": true,
+      "detail": "cell prefixed=true, header=# CaseLink export snapshot=2026-10-28T06"
+    },
+    {
+      "id": "S06",
+      "name": "Report totals reconcile with the drill-down case lists",
+      "ok": true,
+      "detail": "overdue 6/6, pending 63/63"
+    },
+    {
+      "id": "S07",
+      "name": "Matching outage still saves the case, keeps rule-based overlap detection and shows matching status",
+      "ok": true,
+      "detail": "case saved 201, mode reported unavailable"
+    }
+  ]
+}

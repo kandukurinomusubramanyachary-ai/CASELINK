@@ -1,0 +1,15 @@
+# M1.1 — regional authorisation evidence (AFTER)
+# Instance: fixed build, fresh seed, CASELINK_DEMO unset (default = false), port 8098, 2026-10-27 20:45 UTC
+
+PROBE 1a: South supervisor reads the West case → HTTP 403
+PROBE 1b: West alert visible on the South supervisor dashboard: false
+PROBE 1c: South supervisor acknowledges the West alert → HTTP 403; persisted state open→open, ackBy=null
+PROBE 1d: West supervisor acknowledges the same alert → HTTP 200; persisted ackBy=u-supervisor-west
+PROBE 2a: West transfer requests created: 201/201
+PROBE 2b: South RB lead reads the West case → HTTP 403
+PROBE 2c: South RB lead REJECTS a West transfer → HTTP 403; transfer pending→pending, owner PGRC→PGRC, version 2→2
+PROBE 2d: South RB lead ACCEPTS a West transfer → HTTP 403; transfer pending→pending, owner PGRC→PGRC, version 2→2
+PROBE 3a: West RB lead accepts a West transfer → HTTP 200; state=accepted owner=RB
+PROBE 3b: West RB lead rejects a West transfer → HTTP 200; state=rejected
+PROBE 4a: Read-only reviewer acknowledges a coordination alert → HTTP 403
+PROBE 4b: Grant 200 → South RB lead read 200 (canViewContent=true); transfer decision on the same case → HTTP 403

@@ -1,0 +1,1591 @@
+{
+  "version": "m6-matching-1",
+  "anchor": "2026-08-03T04:30:00.000Z",
+  "institutions": [
+    {
+      "key": "i1",
+      "permanentId": "AICTE-DEMO-1001",
+      "name": "Sri Vaigai College of Engineering",
+      "alias": "Vaigai Engineering College",
+      "region": "South",
+      "split": "tune"
+    },
+    {
+      "key": "i2",
+      "permanentId": "AICTE-DEMO-1002",
+      "name": "Meenakshi Institute of Technology",
+      "alias": "Meenakshi Tech",
+      "region": "South",
+      "split": "tune"
+    },
+    {
+      "key": "i3",
+      "permanentId": "AICTE-DEMO-1003",
+      "name": "Kaveri Polytechnic College",
+      "alias": null,
+      "region": "South",
+      "split": "tune"
+    },
+    {
+      "key": "i4",
+      "permanentId": "AICTE-DEMO-1004",
+      "name": "Noyyal College of Engineering",
+      "alias": null,
+      "region": "South",
+      "split": "tune"
+    },
+    {
+      "key": "i5",
+      "permanentId": "AICTE-DEMO-1005",
+      "name": "Thamirabarani Institute of Science",
+      "alias": "Thamira Institute",
+      "region": "South",
+      "split": "tune"
+    },
+    {
+      "key": "i6",
+      "permanentId": "AICTE-DEMO-1006",
+      "name": "Agasthiyar College of Technology",
+      "alias": null,
+      "region": "South",
+      "split": "tune"
+    },
+    {
+      "key": "i7",
+      "permanentId": "AICTE-DEMO-1007",
+      "name": "Palar Institute of Engineering",
+      "alias": null,
+      "region": "South",
+      "split": "heldout"
+    },
+    {
+      "key": "i8",
+      "permanentId": "AICTE-DEMO-1008",
+      "name": "Vellar College of Engineering",
+      "alias": null,
+      "region": "South",
+      "split": "heldout"
+    },
+    {
+      "key": "i9",
+      "permanentId": "AICTE-DEMO-1009",
+      "name": "Bhavani Institute of Technology",
+      "alias": "Bhavani Tech",
+      "region": "South",
+      "split": "heldout"
+    },
+    {
+      "key": "i10",
+      "permanentId": "AICTE-DEMO-1010",
+      "name": "Amaravathi College of Engineering",
+      "alias": null,
+      "region": "West",
+      "split": "heldout"
+    }
+  ],
+  "cases": [
+    {
+      "key": "i1-fee1",
+      "institution": "i1",
+      "role": "fee1",
+      "receivedAt": "2026-08-03T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1001/2026",
+      "summary": "Semester fee of Rs 18500 paid at Sri Vaigai College of Engineering before withdrawal has not been refunded; register reference FEE/AICTE-DEMO-1001/2026 is still pending."
+    },
+    {
+      "key": "i1-fee2",
+      "institution": "i1",
+      "role": "fee2",
+      "receivedAt": "2026-08-05T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1001/2026",
+      "summary": "Withdrawal from Vaigai Engineering College on 12 July: the semester fee of Rs 18500 was not refunded although register reference FEE/AICTE-DEMO-1001/2026 was quoted in my letter."
+    },
+    {
+      "key": "i1-fee3",
+      "institution": "i1",
+      "role": "fee3",
+      "receivedAt": "2026-08-08T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1001/2026",
+      "summary": "Refund of the semester fee Rs 18500 at Sri Vaigai College of Engineering is pending against register reference FEE/AICTE-DEMO-1001/2026. Accounts section says the file is with the principal."
+    },
+    {
+      "key": "i1-hostel1",
+      "institution": "i1",
+      "role": "hostel1",
+      "receivedAt": "2026-08-06T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1001/2026",
+      "summary": "The hostel fee of Rs 9400 for the same semester at Sri Vaigai College of Engineering was charged twice, and the refund against the semester fee is still pending; hostel reference HOSTEL/AICTE-DEMO-1001/2026."
+    },
+    {
+      "key": "i1-hostel2",
+      "institution": "i1",
+      "role": "hostel2",
+      "receivedAt": "2026-08-09T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1001/2026",
+      "summary": "Double charge of the hostel fee Rs 9400 for the semester at Vaigai Engineering College is not adjusted and the pending refund carries hostel reference HOSTEL/AICTE-DEMO-1001/2026."
+    },
+    {
+      "key": "i1-lab",
+      "institution": "i1",
+      "role": "lab",
+      "receivedAt": "2026-09-12T04:30:00.000Z",
+      "category": "Infrastructure",
+      "sourceReference": null,
+      "summary": "The physics laboratory equipment at Sri Vaigai College of Engineering has been out of order since the start of the semester and practical classes are being conducted without instruments."
+    },
+    {
+      "key": "i2-fee1",
+      "institution": "i2",
+      "role": "fee1",
+      "receivedAt": "2026-08-04T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1002/2026",
+      "summary": "Semester fee of Rs 19750 paid at Meenakshi Institute of Technology before withdrawal has not been refunded; register reference FEE/AICTE-DEMO-1002/2026 is still pending."
+    },
+    {
+      "key": "i2-fee2",
+      "institution": "i2",
+      "role": "fee2",
+      "receivedAt": "2026-08-06T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1002/2026",
+      "summary": "Withdrawal from Meenakshi Tech on 12 July: the semester fee of Rs 19750 was not refunded although register reference FEE/AICTE-DEMO-1002/2026 was quoted in my letter."
+    },
+    {
+      "key": "i2-fee3",
+      "institution": "i2",
+      "role": "fee3",
+      "receivedAt": "2026-08-09T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1002/2026",
+      "summary": "Refund of the semester fee Rs 19750 at Meenakshi Institute of Technology is pending against register reference FEE/AICTE-DEMO-1002/2026. Accounts section says the file is with the principal."
+    },
+    {
+      "key": "i2-hostel1",
+      "institution": "i2",
+      "role": "hostel1",
+      "receivedAt": "2026-08-07T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1002/2026",
+      "summary": "The hostel fee of Rs 9775 for the same semester at Meenakshi Institute of Technology was charged twice, and the refund against the semester fee is still pending; hostel reference HOSTEL/AICTE-DEMO-1002/2026."
+    },
+    {
+      "key": "i2-hostel2",
+      "institution": "i2",
+      "role": "hostel2",
+      "receivedAt": "2026-08-10T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1002/2026",
+      "summary": "Double charge of the hostel fee Rs 9775 for the semester at Meenakshi Tech is not adjusted and the pending refund carries hostel reference HOSTEL/AICTE-DEMO-1002/2026."
+    },
+    {
+      "key": "i2-lab",
+      "institution": "i2",
+      "role": "lab",
+      "receivedAt": "2026-09-13T04:30:00.000Z",
+      "category": "Infrastructure",
+      "sourceReference": null,
+      "summary": "The physics laboratory equipment at Meenakshi Institute of Technology has been out of order since the start of the semester and practical classes are being conducted without instruments."
+    },
+    {
+      "key": "i3-fee1",
+      "institution": "i3",
+      "role": "fee1",
+      "receivedAt": "2026-08-05T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1003/2026",
+      "summary": "Semester fee of Rs 21000 paid at Kaveri Polytechnic College before withdrawal has not been refunded; register reference FEE/AICTE-DEMO-1003/2026 is still pending."
+    },
+    {
+      "key": "i3-fee2",
+      "institution": "i3",
+      "role": "fee2",
+      "receivedAt": "2026-08-07T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1003/2026",
+      "summary": "Withdrawal from Kaveri Polytechnic College on 12 July: the semester fee of Rs 21000 was not refunded although register reference FEE/AICTE-DEMO-1003/2026 was quoted in my letter."
+    },
+    {
+      "key": "i3-fee3",
+      "institution": "i3",
+      "role": "fee3",
+      "receivedAt": "2026-08-10T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1003/2026",
+      "summary": "Refund of the semester fee Rs 21000 at Kaveri Polytechnic College is pending against register reference FEE/AICTE-DEMO-1003/2026. Accounts section says the file is with the principal."
+    },
+    {
+      "key": "i3-hostel1",
+      "institution": "i3",
+      "role": "hostel1",
+      "receivedAt": "2026-08-08T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1003/2026",
+      "summary": "The hostel fee of Rs 10150 for the same semester at Kaveri Polytechnic College was charged twice, and the refund against the semester fee is still pending; hostel reference HOSTEL/AICTE-DEMO-1003/2026."
+    },
+    {
+      "key": "i3-hostel2",
+      "institution": "i3",
+      "role": "hostel2",
+      "receivedAt": "2026-08-11T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1003/2026",
+      "summary": "Double charge of the hostel fee Rs 10150 for the semester at Kaveri Polytechnic College is not adjusted and the pending refund carries hostel reference HOSTEL/AICTE-DEMO-1003/2026."
+    },
+    {
+      "key": "i3-lab",
+      "institution": "i3",
+      "role": "lab",
+      "receivedAt": "2026-09-14T04:30:00.000Z",
+      "category": "Infrastructure",
+      "sourceReference": null,
+      "summary": "The physics laboratory equipment at Kaveri Polytechnic College has been out of order since the start of the semester and practical classes are being conducted without instruments."
+    },
+    {
+      "key": "i4-fee1",
+      "institution": "i4",
+      "role": "fee1",
+      "receivedAt": "2026-08-06T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1004/2026",
+      "summary": "Semester fee of Rs 22250 paid at Noyyal College of Engineering before withdrawal has not been refunded; register reference FEE/AICTE-DEMO-1004/2026 is still pending."
+    },
+    {
+      "key": "i4-fee2",
+      "institution": "i4",
+      "role": "fee2",
+      "receivedAt": "2026-08-08T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1004/2026",
+      "summary": "Withdrawal from Noyyal College of Engineering on 12 July: the semester fee of Rs 22250 was not refunded although register reference FEE/AICTE-DEMO-1004/2026 was quoted in my letter."
+    },
+    {
+      "key": "i4-fee3",
+      "institution": "i4",
+      "role": "fee3",
+      "receivedAt": "2026-08-11T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1004/2026",
+      "summary": "Refund of the semester fee Rs 22250 at Noyyal College of Engineering is pending against register reference FEE/AICTE-DEMO-1004/2026. Accounts section says the file is with the principal."
+    },
+    {
+      "key": "i4-hostel1",
+      "institution": "i4",
+      "role": "hostel1",
+      "receivedAt": "2026-08-09T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1004/2026",
+      "summary": "The hostel fee of Rs 10525 for the same semester at Noyyal College of Engineering was charged twice, and the refund against the semester fee is still pending; hostel reference HOSTEL/AICTE-DEMO-1004/2026."
+    },
+    {
+      "key": "i4-hostel2",
+      "institution": "i4",
+      "role": "hostel2",
+      "receivedAt": "2026-08-12T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1004/2026",
+      "summary": "Double charge of the hostel fee Rs 10525 for the semester at Noyyal College of Engineering is not adjusted and the pending refund carries hostel reference HOSTEL/AICTE-DEMO-1004/2026."
+    },
+    {
+      "key": "i4-lab",
+      "institution": "i4",
+      "role": "lab",
+      "receivedAt": "2026-09-15T04:30:00.000Z",
+      "category": "Infrastructure",
+      "sourceReference": null,
+      "summary": "The physics laboratory equipment at Noyyal College of Engineering has been out of order since the start of the semester and practical classes are being conducted without instruments."
+    },
+    {
+      "key": "i5-fee1",
+      "institution": "i5",
+      "role": "fee1",
+      "receivedAt": "2026-08-07T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1005/2026",
+      "summary": "Semester fee of Rs 23500 paid at Thamirabarani Institute of Science before withdrawal has not been refunded; register reference FEE/AICTE-DEMO-1005/2026 is still pending."
+    },
+    {
+      "key": "i5-fee2",
+      "institution": "i5",
+      "role": "fee2",
+      "receivedAt": "2026-08-09T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1005/2026",
+      "summary": "Withdrawal from Thamira Institute on 12 July: the semester fee of Rs 23500 was not refunded although register reference FEE/AICTE-DEMO-1005/2026 was quoted in my letter."
+    },
+    {
+      "key": "i5-fee3",
+      "institution": "i5",
+      "role": "fee3",
+      "receivedAt": "2026-08-12T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1005/2026",
+      "summary": "Refund of the semester fee Rs 23500 at Thamirabarani Institute of Science is pending against register reference FEE/AICTE-DEMO-1005/2026. Accounts section says the file is with the principal."
+    },
+    {
+      "key": "i5-hostel1",
+      "institution": "i5",
+      "role": "hostel1",
+      "receivedAt": "2026-08-10T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1005/2026",
+      "summary": "The hostel fee of Rs 10900 for the same semester at Thamirabarani Institute of Science was charged twice, and the refund against the semester fee is still pending; hostel reference HOSTEL/AICTE-DEMO-1005/2026."
+    },
+    {
+      "key": "i5-hostel2",
+      "institution": "i5",
+      "role": "hostel2",
+      "receivedAt": "2026-08-13T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1005/2026",
+      "summary": "Double charge of the hostel fee Rs 10900 for the semester at Thamira Institute is not adjusted and the pending refund carries hostel reference HOSTEL/AICTE-DEMO-1005/2026."
+    },
+    {
+      "key": "i5-lab",
+      "institution": "i5",
+      "role": "lab",
+      "receivedAt": "2026-09-16T04:30:00.000Z",
+      "category": "Infrastructure",
+      "sourceReference": null,
+      "summary": "The physics laboratory equipment at Thamirabarani Institute of Science has been out of order since the start of the semester and practical classes are being conducted without instruments."
+    },
+    {
+      "key": "i6-fee1",
+      "institution": "i6",
+      "role": "fee1",
+      "receivedAt": "2026-08-08T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1006/2026",
+      "summary": "Semester fee of Rs 24750 paid at Agasthiyar College of Technology before withdrawal has not been refunded; register reference FEE/AICTE-DEMO-1006/2026 is still pending."
+    },
+    {
+      "key": "i6-fee2",
+      "institution": "i6",
+      "role": "fee2",
+      "receivedAt": "2026-08-10T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1006/2026",
+      "summary": "Withdrawal from Agasthiyar College of Technology on 12 July: the semester fee of Rs 24750 was not refunded although register reference FEE/AICTE-DEMO-1006/2026 was quoted in my letter."
+    },
+    {
+      "key": "i6-fee3",
+      "institution": "i6",
+      "role": "fee3",
+      "receivedAt": "2026-08-13T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1006/2026",
+      "summary": "Refund of the semester fee Rs 24750 at Agasthiyar College of Technology is pending against register reference FEE/AICTE-DEMO-1006/2026. Accounts section says the file is with the principal."
+    },
+    {
+      "key": "i6-hostel1",
+      "institution": "i6",
+      "role": "hostel1",
+      "receivedAt": "2026-08-11T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1006/2026",
+      "summary": "The hostel fee of Rs 11275 for the same semester at Agasthiyar College of Technology was charged twice, and the refund against the semester fee is still pending; hostel reference HOSTEL/AICTE-DEMO-1006/2026."
+    },
+    {
+      "key": "i6-hostel2",
+      "institution": "i6",
+      "role": "hostel2",
+      "receivedAt": "2026-08-14T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1006/2026",
+      "summary": "Double charge of the hostel fee Rs 11275 for the semester at Agasthiyar College of Technology is not adjusted and the pending refund carries hostel reference HOSTEL/AICTE-DEMO-1006/2026."
+    },
+    {
+      "key": "i6-lab",
+      "institution": "i6",
+      "role": "lab",
+      "receivedAt": "2026-09-17T04:30:00.000Z",
+      "category": "Infrastructure",
+      "sourceReference": null,
+      "summary": "The physics laboratory equipment at Agasthiyar College of Technology has been out of order since the start of the semester and practical classes are being conducted without instruments."
+    },
+    {
+      "key": "i7-fee1",
+      "institution": "i7",
+      "role": "fee1",
+      "receivedAt": "2026-08-09T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1007/2026",
+      "summary": "Semester fee of Rs 26000 paid at Palar Institute of Engineering before withdrawal has not been refunded; register reference FEE/AICTE-DEMO-1007/2026 is still pending."
+    },
+    {
+      "key": "i7-fee2",
+      "institution": "i7",
+      "role": "fee2",
+      "receivedAt": "2026-08-11T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1007/2026",
+      "summary": "Withdrawal from Palar Institute of Engineering on 12 July: the semester fee of Rs 26000 was not refunded although register reference FEE/AICTE-DEMO-1007/2026 was quoted in my letter."
+    },
+    {
+      "key": "i7-fee3",
+      "institution": "i7",
+      "role": "fee3",
+      "receivedAt": "2026-08-14T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1007/2026",
+      "summary": "Refund of the semester fee Rs 26000 at Palar Institute of Engineering is pending against register reference FEE/AICTE-DEMO-1007/2026. Accounts section says the file is with the principal."
+    },
+    {
+      "key": "i7-hostel1",
+      "institution": "i7",
+      "role": "hostel1",
+      "receivedAt": "2026-08-12T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1007/2026",
+      "summary": "The hostel fee of Rs 11650 for the same semester at Palar Institute of Engineering was charged twice, and the refund against the semester fee is still pending; hostel reference HOSTEL/AICTE-DEMO-1007/2026."
+    },
+    {
+      "key": "i7-hostel2",
+      "institution": "i7",
+      "role": "hostel2",
+      "receivedAt": "2026-08-15T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1007/2026",
+      "summary": "Double charge of the hostel fee Rs 11650 for the semester at Palar Institute of Engineering is not adjusted and the pending refund carries hostel reference HOSTEL/AICTE-DEMO-1007/2026."
+    },
+    {
+      "key": "i7-lab",
+      "institution": "i7",
+      "role": "lab",
+      "receivedAt": "2026-09-18T04:30:00.000Z",
+      "category": "Infrastructure",
+      "sourceReference": null,
+      "summary": "The physics laboratory equipment at Palar Institute of Engineering has been out of order since the start of the semester and practical classes are being conducted without instruments."
+    },
+    {
+      "key": "i8-fee1",
+      "institution": "i8",
+      "role": "fee1",
+      "receivedAt": "2026-08-10T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1008/2026",
+      "summary": "Semester fee of Rs 27250 paid at Vellar College of Engineering before withdrawal has not been refunded; register reference FEE/AICTE-DEMO-1008/2026 is still pending."
+    },
+    {
+      "key": "i8-fee2",
+      "institution": "i8",
+      "role": "fee2",
+      "receivedAt": "2026-08-12T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1008/2026",
+      "summary": "Withdrawal from Vellar College of Engineering on 12 July: the semester fee of Rs 27250 was not refunded although register reference FEE/AICTE-DEMO-1008/2026 was quoted in my letter."
+    },
+    {
+      "key": "i8-fee3",
+      "institution": "i8",
+      "role": "fee3",
+      "receivedAt": "2026-08-15T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1008/2026",
+      "summary": "Refund of the semester fee Rs 27250 at Vellar College of Engineering is pending against register reference FEE/AICTE-DEMO-1008/2026. Accounts section says the file is with the principal."
+    },
+    {
+      "key": "i8-hostel1",
+      "institution": "i8",
+      "role": "hostel1",
+      "receivedAt": "2026-08-13T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1008/2026",
+      "summary": "The hostel fee of Rs 12025 for the same semester at Vellar College of Engineering was charged twice, and the refund against the semester fee is still pending; hostel reference HOSTEL/AICTE-DEMO-1008/2026."
+    },
+    {
+      "key": "i8-hostel2",
+      "institution": "i8",
+      "role": "hostel2",
+      "receivedAt": "2026-08-16T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1008/2026",
+      "summary": "Double charge of the hostel fee Rs 12025 for the semester at Vellar College of Engineering is not adjusted and the pending refund carries hostel reference HOSTEL/AICTE-DEMO-1008/2026."
+    },
+    {
+      "key": "i8-lab",
+      "institution": "i8",
+      "role": "lab",
+      "receivedAt": "2026-09-19T04:30:00.000Z",
+      "category": "Infrastructure",
+      "sourceReference": null,
+      "summary": "The physics laboratory equipment at Vellar College of Engineering has been out of order since the start of the semester and practical classes are being conducted without instruments."
+    },
+    {
+      "key": "i9-fee1",
+      "institution": "i9",
+      "role": "fee1",
+      "receivedAt": "2026-08-11T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1009/2026",
+      "summary": "Semester fee of Rs 28500 paid at Bhavani Institute of Technology before withdrawal has not been refunded; register reference FEE/AICTE-DEMO-1009/2026 is still pending."
+    },
+    {
+      "key": "i9-fee2",
+      "institution": "i9",
+      "role": "fee2",
+      "receivedAt": "2026-08-13T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1009/2026",
+      "summary": "Withdrawal from Bhavani Tech on 12 July: the semester fee of Rs 28500 was not refunded although register reference FEE/AICTE-DEMO-1009/2026 was quoted in my letter."
+    },
+    {
+      "key": "i9-fee3",
+      "institution": "i9",
+      "role": "fee3",
+      "receivedAt": "2026-08-16T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1009/2026",
+      "summary": "Refund of the semester fee Rs 28500 at Bhavani Institute of Technology is pending against register reference FEE/AICTE-DEMO-1009/2026. Accounts section says the file is with the principal."
+    },
+    {
+      "key": "i9-hostel1",
+      "institution": "i9",
+      "role": "hostel1",
+      "receivedAt": "2026-08-14T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1009/2026",
+      "summary": "The hostel fee of Rs 12400 for the same semester at Bhavani Institute of Technology was charged twice, and the refund against the semester fee is still pending; hostel reference HOSTEL/AICTE-DEMO-1009/2026."
+    },
+    {
+      "key": "i9-hostel2",
+      "institution": "i9",
+      "role": "hostel2",
+      "receivedAt": "2026-08-17T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1009/2026",
+      "summary": "Double charge of the hostel fee Rs 12400 for the semester at Bhavani Tech is not adjusted and the pending refund carries hostel reference HOSTEL/AICTE-DEMO-1009/2026."
+    },
+    {
+      "key": "i9-lab",
+      "institution": "i9",
+      "role": "lab",
+      "receivedAt": "2026-09-20T04:30:00.000Z",
+      "category": "Infrastructure",
+      "sourceReference": null,
+      "summary": "The physics laboratory equipment at Bhavani Institute of Technology has been out of order since the start of the semester and practical classes are being conducted without instruments."
+    },
+    {
+      "key": "i10-fee1",
+      "institution": "i10",
+      "role": "fee1",
+      "receivedAt": "2026-08-12T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1010/2026",
+      "summary": "Semester fee of Rs 29750 paid at Amaravathi College of Engineering before withdrawal has not been refunded; register reference FEE/AICTE-DEMO-1010/2026 is still pending."
+    },
+    {
+      "key": "i10-fee2",
+      "institution": "i10",
+      "role": "fee2",
+      "receivedAt": "2026-08-14T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1010/2026",
+      "summary": "Withdrawal from Amaravathi College of Engineering on 12 July: the semester fee of Rs 29750 was not refunded although register reference FEE/AICTE-DEMO-1010/2026 was quoted in my letter."
+    },
+    {
+      "key": "i10-fee3",
+      "institution": "i10",
+      "role": "fee3",
+      "receivedAt": "2026-08-17T04:30:00.000Z",
+      "category": "Fee / refund",
+      "sourceReference": "FEE/AICTE-DEMO-1010/2026",
+      "summary": "Refund of the semester fee Rs 29750 at Amaravathi College of Engineering is pending against register reference FEE/AICTE-DEMO-1010/2026. Accounts section says the file is with the principal."
+    },
+    {
+      "key": "i10-hostel1",
+      "institution": "i10",
+      "role": "hostel1",
+      "receivedAt": "2026-08-15T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1010/2026",
+      "summary": "The hostel fee of Rs 12775 for the same semester at Amaravathi College of Engineering was charged twice, and the refund against the semester fee is still pending; hostel reference HOSTEL/AICTE-DEMO-1010/2026."
+    },
+    {
+      "key": "i10-hostel2",
+      "institution": "i10",
+      "role": "hostel2",
+      "receivedAt": "2026-08-18T04:30:00.000Z",
+      "category": "Hostel / accommodation",
+      "sourceReference": "HOSTEL/AICTE-DEMO-1010/2026",
+      "summary": "Double charge of the hostel fee Rs 12775 for the semester at Amaravathi College of Engineering is not adjusted and the pending refund carries hostel reference HOSTEL/AICTE-DEMO-1010/2026."
+    },
+    {
+      "key": "i10-lab",
+      "institution": "i10",
+      "role": "lab",
+      "receivedAt": "2026-09-21T04:30:00.000Z",
+      "category": "Infrastructure",
+      "sourceReference": null,
+      "summary": "The physics laboratory equipment at Amaravathi College of Engineering has been out of order since the start of the semester and practical classes are being conducted without instruments."
+    }
+  ],
+  "pairs": [
+    {
+      "a": "i1-fee1",
+      "b": "i1-fee2",
+      "label": "duplicate",
+      "family": "i1",
+      "split": "tune",
+      "note": "same refund incident, same register reference"
+    },
+    {
+      "a": "i1-fee1",
+      "b": "i1-fee3",
+      "label": "duplicate",
+      "family": "i1",
+      "split": "tune",
+      "note": "same refund incident, third restatement"
+    },
+    {
+      "a": "i1-fee2",
+      "b": "i1-fee3",
+      "label": "duplicate",
+      "family": "i1",
+      "split": "tune",
+      "note": "same refund incident, paraphrased"
+    },
+    {
+      "a": "i1-hostel1",
+      "b": "i1-hostel2",
+      "label": "duplicate",
+      "family": "i1",
+      "split": "tune",
+      "note": "same hostel double-charge, same hostel reference"
+    },
+    {
+      "a": "i1-hostel1",
+      "b": "i1-fee1",
+      "label": "related",
+      "family": "i1",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i1-hostel1",
+      "b": "i1-fee2",
+      "label": "related",
+      "family": "i1",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i1-hostel2",
+      "b": "i1-fee1",
+      "label": "related",
+      "family": "i1",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i1-fee3",
+      "b": "i1-hostel1",
+      "label": "related",
+      "family": "i1",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i1-lab",
+      "b": "i1-fee1",
+      "label": "unrelated",
+      "family": "i1",
+      "split": "tune",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i1-lab",
+      "b": "i1-hostel1",
+      "label": "unrelated",
+      "family": "i1",
+      "split": "tune",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i2-fee1",
+      "b": "i2-fee2",
+      "label": "duplicate",
+      "family": "i2",
+      "split": "tune",
+      "note": "same refund incident, same register reference"
+    },
+    {
+      "a": "i2-fee1",
+      "b": "i2-fee3",
+      "label": "duplicate",
+      "family": "i2",
+      "split": "tune",
+      "note": "same refund incident, third restatement"
+    },
+    {
+      "a": "i2-fee2",
+      "b": "i2-fee3",
+      "label": "duplicate",
+      "family": "i2",
+      "split": "tune",
+      "note": "same refund incident, paraphrased"
+    },
+    {
+      "a": "i2-hostel1",
+      "b": "i2-hostel2",
+      "label": "duplicate",
+      "family": "i2",
+      "split": "tune",
+      "note": "same hostel double-charge, same hostel reference"
+    },
+    {
+      "a": "i2-hostel1",
+      "b": "i2-fee1",
+      "label": "related",
+      "family": "i2",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i2-hostel1",
+      "b": "i2-fee2",
+      "label": "related",
+      "family": "i2",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i2-hostel2",
+      "b": "i2-fee1",
+      "label": "related",
+      "family": "i2",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i2-fee3",
+      "b": "i2-hostel1",
+      "label": "related",
+      "family": "i2",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i2-lab",
+      "b": "i2-fee1",
+      "label": "unrelated",
+      "family": "i2",
+      "split": "tune",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i2-lab",
+      "b": "i2-hostel1",
+      "label": "unrelated",
+      "family": "i2",
+      "split": "tune",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i3-fee1",
+      "b": "i3-fee2",
+      "label": "duplicate",
+      "family": "i3",
+      "split": "tune",
+      "note": "same refund incident, same register reference"
+    },
+    {
+      "a": "i3-fee1",
+      "b": "i3-fee3",
+      "label": "duplicate",
+      "family": "i3",
+      "split": "tune",
+      "note": "same refund incident, third restatement"
+    },
+    {
+      "a": "i3-fee2",
+      "b": "i3-fee3",
+      "label": "duplicate",
+      "family": "i3",
+      "split": "tune",
+      "note": "same refund incident, paraphrased"
+    },
+    {
+      "a": "i3-hostel1",
+      "b": "i3-hostel2",
+      "label": "duplicate",
+      "family": "i3",
+      "split": "tune",
+      "note": "same hostel double-charge, same hostel reference"
+    },
+    {
+      "a": "i3-hostel1",
+      "b": "i3-fee1",
+      "label": "related",
+      "family": "i3",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i3-hostel1",
+      "b": "i3-fee2",
+      "label": "related",
+      "family": "i3",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i3-hostel2",
+      "b": "i3-fee1",
+      "label": "related",
+      "family": "i3",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i3-fee3",
+      "b": "i3-hostel1",
+      "label": "related",
+      "family": "i3",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i3-lab",
+      "b": "i3-fee1",
+      "label": "unrelated",
+      "family": "i3",
+      "split": "tune",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i3-lab",
+      "b": "i3-hostel1",
+      "label": "unrelated",
+      "family": "i3",
+      "split": "tune",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i4-fee1",
+      "b": "i4-fee2",
+      "label": "duplicate",
+      "family": "i4",
+      "split": "tune",
+      "note": "same refund incident, same register reference"
+    },
+    {
+      "a": "i4-fee1",
+      "b": "i4-fee3",
+      "label": "duplicate",
+      "family": "i4",
+      "split": "tune",
+      "note": "same refund incident, third restatement"
+    },
+    {
+      "a": "i4-fee2",
+      "b": "i4-fee3",
+      "label": "duplicate",
+      "family": "i4",
+      "split": "tune",
+      "note": "same refund incident, paraphrased"
+    },
+    {
+      "a": "i4-hostel1",
+      "b": "i4-hostel2",
+      "label": "duplicate",
+      "family": "i4",
+      "split": "tune",
+      "note": "same hostel double-charge, same hostel reference"
+    },
+    {
+      "a": "i4-hostel1",
+      "b": "i4-fee1",
+      "label": "related",
+      "family": "i4",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i4-hostel1",
+      "b": "i4-fee2",
+      "label": "related",
+      "family": "i4",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i4-hostel2",
+      "b": "i4-fee1",
+      "label": "related",
+      "family": "i4",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i4-fee3",
+      "b": "i4-hostel1",
+      "label": "related",
+      "family": "i4",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i4-lab",
+      "b": "i4-fee1",
+      "label": "unrelated",
+      "family": "i4",
+      "split": "tune",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i4-lab",
+      "b": "i4-hostel1",
+      "label": "unrelated",
+      "family": "i4",
+      "split": "tune",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i5-fee1",
+      "b": "i5-fee2",
+      "label": "duplicate",
+      "family": "i5",
+      "split": "tune",
+      "note": "same refund incident, same register reference"
+    },
+    {
+      "a": "i5-fee1",
+      "b": "i5-fee3",
+      "label": "duplicate",
+      "family": "i5",
+      "split": "tune",
+      "note": "same refund incident, third restatement"
+    },
+    {
+      "a": "i5-fee2",
+      "b": "i5-fee3",
+      "label": "duplicate",
+      "family": "i5",
+      "split": "tune",
+      "note": "same refund incident, paraphrased"
+    },
+    {
+      "a": "i5-hostel1",
+      "b": "i5-hostel2",
+      "label": "duplicate",
+      "family": "i5",
+      "split": "tune",
+      "note": "same hostel double-charge, same hostel reference"
+    },
+    {
+      "a": "i5-hostel1",
+      "b": "i5-fee1",
+      "label": "related",
+      "family": "i5",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i5-hostel1",
+      "b": "i5-fee2",
+      "label": "related",
+      "family": "i5",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i5-hostel2",
+      "b": "i5-fee1",
+      "label": "related",
+      "family": "i5",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i5-fee3",
+      "b": "i5-hostel1",
+      "label": "related",
+      "family": "i5",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i5-lab",
+      "b": "i5-fee1",
+      "label": "unrelated",
+      "family": "i5",
+      "split": "tune",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i5-lab",
+      "b": "i5-hostel1",
+      "label": "unrelated",
+      "family": "i5",
+      "split": "tune",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i6-fee1",
+      "b": "i6-fee2",
+      "label": "duplicate",
+      "family": "i6",
+      "split": "tune",
+      "note": "same refund incident, same register reference"
+    },
+    {
+      "a": "i6-fee1",
+      "b": "i6-fee3",
+      "label": "duplicate",
+      "family": "i6",
+      "split": "tune",
+      "note": "same refund incident, third restatement"
+    },
+    {
+      "a": "i6-fee2",
+      "b": "i6-fee3",
+      "label": "duplicate",
+      "family": "i6",
+      "split": "tune",
+      "note": "same refund incident, paraphrased"
+    },
+    {
+      "a": "i6-hostel1",
+      "b": "i6-hostel2",
+      "label": "duplicate",
+      "family": "i6",
+      "split": "tune",
+      "note": "same hostel double-charge, same hostel reference"
+    },
+    {
+      "a": "i6-hostel1",
+      "b": "i6-fee1",
+      "label": "related",
+      "family": "i6",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i6-hostel1",
+      "b": "i6-fee2",
+      "label": "related",
+      "family": "i6",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i6-hostel2",
+      "b": "i6-fee1",
+      "label": "related",
+      "family": "i6",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i6-fee3",
+      "b": "i6-hostel1",
+      "label": "related",
+      "family": "i6",
+      "split": "tune",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i6-lab",
+      "b": "i6-fee1",
+      "label": "unrelated",
+      "family": "i6",
+      "split": "tune",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i6-lab",
+      "b": "i6-hostel1",
+      "label": "unrelated",
+      "family": "i6",
+      "split": "tune",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i7-fee1",
+      "b": "i7-fee2",
+      "label": "duplicate",
+      "family": "i7",
+      "split": "heldout",
+      "note": "same refund incident, same register reference"
+    },
+    {
+      "a": "i7-fee1",
+      "b": "i7-fee3",
+      "label": "duplicate",
+      "family": "i7",
+      "split": "heldout",
+      "note": "same refund incident, third restatement"
+    },
+    {
+      "a": "i7-fee2",
+      "b": "i7-fee3",
+      "label": "duplicate",
+      "family": "i7",
+      "split": "heldout",
+      "note": "same refund incident, paraphrased"
+    },
+    {
+      "a": "i7-hostel1",
+      "b": "i7-hostel2",
+      "label": "duplicate",
+      "family": "i7",
+      "split": "heldout",
+      "note": "same hostel double-charge, same hostel reference"
+    },
+    {
+      "a": "i7-hostel1",
+      "b": "i7-fee1",
+      "label": "related",
+      "family": "i7",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i7-hostel1",
+      "b": "i7-fee2",
+      "label": "related",
+      "family": "i7",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i7-hostel2",
+      "b": "i7-fee1",
+      "label": "related",
+      "family": "i7",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i7-fee3",
+      "b": "i7-hostel1",
+      "label": "related",
+      "family": "i7",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i7-lab",
+      "b": "i7-fee1",
+      "label": "unrelated",
+      "family": "i7",
+      "split": "heldout",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i7-lab",
+      "b": "i7-hostel1",
+      "label": "unrelated",
+      "family": "i7",
+      "split": "heldout",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i8-fee1",
+      "b": "i8-fee2",
+      "label": "duplicate",
+      "family": "i8",
+      "split": "heldout",
+      "note": "same refund incident, same register reference"
+    },
+    {
+      "a": "i8-fee1",
+      "b": "i8-fee3",
+      "label": "duplicate",
+      "family": "i8",
+      "split": "heldout",
+      "note": "same refund incident, third restatement"
+    },
+    {
+      "a": "i8-fee2",
+      "b": "i8-fee3",
+      "label": "duplicate",
+      "family": "i8",
+      "split": "heldout",
+      "note": "same refund incident, paraphrased"
+    },
+    {
+      "a": "i8-hostel1",
+      "b": "i8-hostel2",
+      "label": "duplicate",
+      "family": "i8",
+      "split": "heldout",
+      "note": "same hostel double-charge, same hostel reference"
+    },
+    {
+      "a": "i8-hostel1",
+      "b": "i8-fee1",
+      "label": "related",
+      "family": "i8",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i8-hostel1",
+      "b": "i8-fee2",
+      "label": "related",
+      "family": "i8",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i8-hostel2",
+      "b": "i8-fee1",
+      "label": "related",
+      "family": "i8",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i8-fee3",
+      "b": "i8-hostel1",
+      "label": "related",
+      "family": "i8",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i8-lab",
+      "b": "i8-fee1",
+      "label": "unrelated",
+      "family": "i8",
+      "split": "heldout",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i8-lab",
+      "b": "i8-hostel1",
+      "label": "unrelated",
+      "family": "i8",
+      "split": "heldout",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i9-fee1",
+      "b": "i9-fee2",
+      "label": "duplicate",
+      "family": "i9",
+      "split": "heldout",
+      "note": "same refund incident, same register reference"
+    },
+    {
+      "a": "i9-fee1",
+      "b": "i9-fee3",
+      "label": "duplicate",
+      "family": "i9",
+      "split": "heldout",
+      "note": "same refund incident, third restatement"
+    },
+    {
+      "a": "i9-fee2",
+      "b": "i9-fee3",
+      "label": "duplicate",
+      "family": "i9",
+      "split": "heldout",
+      "note": "same refund incident, paraphrased"
+    },
+    {
+      "a": "i9-hostel1",
+      "b": "i9-hostel2",
+      "label": "duplicate",
+      "family": "i9",
+      "split": "heldout",
+      "note": "same hostel double-charge, same hostel reference"
+    },
+    {
+      "a": "i9-hostel1",
+      "b": "i9-fee1",
+      "label": "related",
+      "family": "i9",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i9-hostel1",
+      "b": "i9-fee2",
+      "label": "related",
+      "family": "i9",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i9-hostel2",
+      "b": "i9-fee1",
+      "label": "related",
+      "family": "i9",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i9-fee3",
+      "b": "i9-hostel1",
+      "label": "related",
+      "family": "i9",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i9-lab",
+      "b": "i9-fee1",
+      "label": "unrelated",
+      "family": "i9",
+      "split": "heldout",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i9-lab",
+      "b": "i9-hostel1",
+      "label": "unrelated",
+      "family": "i9",
+      "split": "heldout",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i10-fee1",
+      "b": "i10-fee2",
+      "label": "duplicate",
+      "family": "i10",
+      "split": "heldout",
+      "note": "same refund incident, same register reference"
+    },
+    {
+      "a": "i10-fee1",
+      "b": "i10-fee3",
+      "label": "duplicate",
+      "family": "i10",
+      "split": "heldout",
+      "note": "same refund incident, third restatement"
+    },
+    {
+      "a": "i10-fee2",
+      "b": "i10-fee3",
+      "label": "duplicate",
+      "family": "i10",
+      "split": "heldout",
+      "note": "same refund incident, paraphrased"
+    },
+    {
+      "a": "i10-hostel1",
+      "b": "i10-hostel2",
+      "label": "duplicate",
+      "family": "i10",
+      "split": "heldout",
+      "note": "same hostel double-charge, same hostel reference"
+    },
+    {
+      "a": "i10-hostel1",
+      "b": "i10-fee1",
+      "label": "related",
+      "family": "i10",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i10-hostel1",
+      "b": "i10-fee2",
+      "label": "related",
+      "family": "i10",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i10-hostel2",
+      "b": "i10-fee1",
+      "label": "related",
+      "family": "i10",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i10-fee3",
+      "b": "i10-hostel1",
+      "label": "related",
+      "family": "i10",
+      "split": "heldout",
+      "note": "hostel component of the same incident"
+    },
+    {
+      "a": "i10-lab",
+      "b": "i10-fee1",
+      "label": "unrelated",
+      "family": "i10",
+      "split": "heldout",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i10-lab",
+      "b": "i10-hostel1",
+      "label": "unrelated",
+      "family": "i10",
+      "split": "heldout",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i1-lab",
+      "b": "i1-fee2",
+      "label": "unrelated",
+      "family": "i1",
+      "split": "tune",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i7-lab",
+      "b": "i7-fee2",
+      "label": "unrelated",
+      "family": "i7",
+      "split": "heldout",
+      "note": "same college, different incident and different period"
+    },
+    {
+      "a": "i1-lab",
+      "b": "i2-lab",
+      "label": "unrelated",
+      "family": "i1",
+      "split": "tune",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i1-lab",
+      "b": "i3-lab",
+      "label": "unrelated",
+      "family": "i1",
+      "split": "tune",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i1-lab",
+      "b": "i4-lab",
+      "label": "unrelated",
+      "family": "i1",
+      "split": "tune",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i1-lab",
+      "b": "i5-lab",
+      "label": "unrelated",
+      "family": "i1",
+      "split": "tune",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i1-lab",
+      "b": "i6-lab",
+      "label": "unrelated",
+      "family": "i1",
+      "split": "tune",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i2-lab",
+      "b": "i3-lab",
+      "label": "unrelated",
+      "family": "i2",
+      "split": "tune",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i2-lab",
+      "b": "i4-lab",
+      "label": "unrelated",
+      "family": "i2",
+      "split": "tune",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i2-lab",
+      "b": "i5-lab",
+      "label": "unrelated",
+      "family": "i2",
+      "split": "tune",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i2-lab",
+      "b": "i6-lab",
+      "label": "unrelated",
+      "family": "i2",
+      "split": "tune",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i3-lab",
+      "b": "i4-lab",
+      "label": "unrelated",
+      "family": "i3",
+      "split": "tune",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i3-lab",
+      "b": "i5-lab",
+      "label": "unrelated",
+      "family": "i3",
+      "split": "tune",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i3-lab",
+      "b": "i6-lab",
+      "label": "unrelated",
+      "family": "i3",
+      "split": "tune",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i7-lab",
+      "b": "i8-lab",
+      "label": "unrelated",
+      "family": "i7",
+      "split": "heldout",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i7-lab",
+      "b": "i9-lab",
+      "label": "unrelated",
+      "family": "i7",
+      "split": "heldout",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i7-lab",
+      "b": "i10-lab",
+      "label": "unrelated",
+      "family": "i7",
+      "split": "heldout",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i8-lab",
+      "b": "i9-lab",
+      "label": "unrelated",
+      "family": "i8",
+      "split": "heldout",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i8-lab",
+      "b": "i10-lab",
+      "label": "unrelated",
+      "family": "i8",
+      "split": "heldout",
+      "note": "identical wording at a different institution ID"
+    },
+    {
+      "a": "i9-lab",
+      "b": "i10-lab",
+      "label": "unrelated",
+      "family": "i9",
+      "split": "heldout",
+      "note": "identical wording at a different institution ID"
+    }
+  ],
+  "fingerprint": "6f67e2108013c086"
+}

@@ -1,0 +1,161 @@
+{
+  "measuredAt": "2026-10-28T07:27:15.530Z",
+  "machine": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.60GHz × 2",
+    "memoryGb": 1.9,
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "node": "v20.20.2",
+    "sqlite": "3.49.2"
+  },
+  "dataset": {
+    "cases": 10004,
+    "institutions": 100
+  },
+  "sessions": 20,
+  "warmupExcluded": true,
+  "singleSession": {
+    "rounds": 30,
+    "rows": [
+      {
+        "probe": "case list (filtered, 25/page)",
+        "n": 30,
+        "p50": 27.27096800000072,
+        "p95": 34.32629300000008,
+        "errors": 0,
+        "targetP95": 1500
+      },
+      {
+        "probe": "case read (single record)",
+        "n": 30,
+        "p50": 4.864062000000558,
+        "p95": 7.938524000001053,
+        "errors": 0,
+        "targetP95": 1500
+      },
+      {
+        "probe": "mutation (record an action)",
+        "n": 30,
+        "p50": 6.5929009999999835,
+        "p95": 11.607916000000841,
+        "errors": 0,
+        "targetP95": 2000
+      },
+      {
+        "probe": "dashboard (report summary)",
+        "n": 30,
+        "p50": 108.000594000001,
+        "p95": 189.7133619999986,
+        "errors": 0,
+        "targetP95": 10000
+      },
+      {
+        "probe": "coordination list",
+        "n": 30,
+        "p50": 682.2557999999999,
+        "p95": 752.1817139999985,
+        "errors": 0,
+        "targetP95": null
+      }
+    ]
+  },
+  "concurrentMixed": {
+    "sessions": 20,
+    "rounds": 12,
+    "rows": [
+      {
+        "probe": "case list (filtered, 25/page)",
+        "n": 240,
+        "p50": 864.0781459999998,
+        "p95": 6357.657250000004,
+        "errors": 0,
+        "targetP95": 1500
+      },
+      {
+        "probe": "case read (single record)",
+        "n": 156,
+        "p50": 721.3737160000019,
+        "p95": 3087.909176000001,
+        "errors": 0,
+        "targetP95": 1500
+      },
+      {
+        "probe": "mutation (record an action)",
+        "n": 96,
+        "p50": 18.456704999996873,
+        "p95": 27.54250700000557,
+        "errors": 0,
+        "targetP95": 2000
+      },
+      {
+        "probe": "dashboard (report summary)",
+        "n": 120,
+        "p50": 720.0348139999842,
+        "p95": 2093.3055199999944,
+        "errors": 0,
+        "targetP95": 10000
+      },
+      {
+        "probe": "coordination list",
+        "n": 240,
+        "p50": 1275.4290080000064,
+        "p95": 6702.986492000004,
+        "errors": 0,
+        "targetP95": null
+      }
+    ]
+  },
+  "concurrentReadOnly": {
+    "sessions": 20,
+    "rounds": 12,
+    "rows": [
+      {
+        "probe": "case list (filtered, 25/page)",
+        "n": 240,
+        "p50": 205.4080890000041,
+        "p95": 368.7128190000076,
+        "errors": 0,
+        "targetP95": 1500
+      },
+      {
+        "probe": "case read (single record)",
+        "n": 156,
+        "p50": 171.6510240000207,
+        "p95": 366.7045050000015,
+        "errors": 0,
+        "targetP95": 1500
+      },
+      {
+        "probe": "mutation (record an action)",
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "errors": 0,
+        "targetP95": 2000
+      },
+      {
+        "probe": "dashboard (report summary)",
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "errors": 0,
+        "targetP95": 10000
+      },
+      {
+        "probe": "coordination list",
+        "n": 0,
+        "p50": null,
+        "p95": null,
+        "errors": 0,
+        "targetP95": null
+      }
+    ]
+  },
+  "overlapAlertMs": 1081.0303620000195,
+  "targets": {
+    "caseRead": 1500,
+    "caseFilter": 1500,
+    "mutation": 2000,
+    "overlapAlert": 5000,
+    "dashboard": 10000
+  }
+}

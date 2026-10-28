@@ -1,0 +1,28 @@
+import { chromium } from 'playwright';
+const BASE = process.env.BASE ?? 'http://127.0.0.1:8082';
+const b = await chromium.launch({ args: ['--no-sandbox'] });
+const ctx = await b.newContext({ viewport: { width: 1440, height: 950 } });
+const p = await ctx.newPage();
+const login = async (u) => {
+  await p.goto(`${BASE}/#/login`);
+  await p.waitForSelector('#username');
+  await p.fill('#username', u); await p.fill('#password', 'caselink-demo');
+  await p.click('button[type=submit]');
+  await p.waitForSelector('button:has-text("Sign out")');
+  await p.waitForTimeout(1200);
+};
+await login('m.nair');
+await p.goto(`${BASE}/#/cases?q=zzz-nothing-matches-this`);
+await p.waitForTimeout(2500);
+console.log('HASH', await p.evaluate(() => location.hash));
+console.log('BODY', (await p.evaluate(() => document.body.innerText)).slice(0, 700).replace(/\n+/g, ' | '));
+const leadCase = ((await p.evaluate(() => document.body.innerText)).match(/PGRC-2026-\d+/) ?? [])[0];
+await p.click('button:has-text("Sign out")');
+await p.waitForSelector('#username');
+await login('l.verma');
+await p.goto(`${BASE}/#/cases`);
+await p.waitForTimeout(2500);
+const body2 = await p.evaluate(() => document.body.innerText);
+console.log('RB LEAD BODY', body2.slice(0, 900).replace(/\n+/g, ' | '));
+console.log('lead case', leadCase, 'still visible?', body2.includes(leadCase));
+await b.close();

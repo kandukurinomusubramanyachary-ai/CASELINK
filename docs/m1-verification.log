@@ -1,0 +1,169 @@
+
+=============== M1 security regressions (demo disabled) ===============
+PASS  Fixture: PGRC lead sees at least one restricted foreign (RB) case  —  RB-2026-00027 bureau=RB access=restricted
+PASS  Fixture: RB lead has a case they own and may upload to  —  RB-2026-00027
+PASS  1a. PGRC lead self-grant on restricted RB case → 403  —  HTTP 403
+PASS  1b. Case remains restricted for the PGRC lead after the attempt  —  access=restricted
+PASS  1c. Contents are still redacted (no complaint text / contact)  —  null
+PASS  1d. No grant row was created for the PGRC lead
+PASS  1e. Restricted detail returns no contents, attachments or history remarks  —  canViewContent=false attachments=0
+PASS  1f. Coordination history remarks stay redacted  —  3 entries
+PASS  3a. Owning bureau lead grants a reviewer read access → 200  —  HTTP 200
+PASS  2a. PGRC lead revoking another bureau's grant → 403  —  HTTP 403
+PASS  2b. The grant record is unchanged after the denied revoke
+PASS  3b. The authorised grant is recorded in business history  —  access_granted
+PASS  3c. Supervisor with oversight may grant access across bureaus → 200  —  HTTP 200
+PASS  3d. Supervisor grant is present in the grant list
+PASS  3e. Supervisor revoke of the same grant → 200  —  HTTP 200
+PASS  4a. Out-of-region access management → 403  —  HTTP 403 case=RB-2026-00027 region=South westLeadRegion=West
+PASS  4b. The case did not become readable as a result  —  access=undefined
+PASS  5a. Granted reviewer evidence upload → 403  —  HTTP 403
+PASS  5b. No attachment was stored  —  0 → 0
+PASS  5c. No upload event was written to history  —  6 → 6
+PASS  5d. The reviewer can still read the case they were granted
+PASS  6. Reviewer denied: PATCH case fields → 403  —  HTTP 403
+PASS  6. Reviewer denied: Add case action → 403  —  HTTP 403
+PASS  6. Reviewer denied: Assign officer → 403  —  HTTP 403
+PASS  6. Reviewer denied: Request transfer → 403  —  HTTP 403
+PASS  6. Reviewer denied: Change deadline → 403  —  HTTP 403
+PASS  6. Reviewer denied: Reopen case → 403  —  HTTP 403
+PASS  6. Reviewer denied: Resolve triage → 403  —  HTTP 403
+PASS  6. Reviewer denied: Escalate case → 403  —  HTTP 403
+PASS  6. Reviewer denied: Manage grants → 403  —  HTTP 403
+PASS  6. Reviewer denied: Confirm relationship → 403  —  HTTP 403
+PASS  6. Reviewer denied: Revoke relationship → 403  —  HTTP 403
+PASS  6z. Case record unchanged after the denied mutations  —  version 1 → 1
+PASS  6y. Reviewer may acknowledge their own notification (personal, not shared state) — no notification fixture  —  skipped
+PASS  7a. Authorised case worker upload still succeeds → 201  —  HTTP 201
+PASS  7b. Attachment count increased  —  0 → 1
+PASS  7c. Upload is recorded in business history
+PASS  7d. Assigned officer can upload evidence to their own case → 201  —  HTTP 201
+PASS  7e. Owning lead grants a foreign-bureau officer read access → 200  —  HTTP 200
+PASS  7f. The granted foreign officer can read the contents
+PASS  7g. The same grant does not allow modifying the case → 403  —  HTTP 403
+PASS  7h. The same grant does not allow evidence upload → 403  —  HTTP 403
+PASS  7i. The same grant does not allow managing access → 403  —  HTTP 403
+PASS  7j. Owning lead can revoke the grant again → 200  —  HTTP 200
+PASS  8. Unauthenticated /api/cases → 401  —  HTTP 401
+PASS  8. Unauthenticated /api/my-work → 401  —  HTTP 401
+PASS  8. Unauthenticated /api/notifications → 401  —  HTTP 401
+PASS  8. Unauthenticated /api/reports/summary → 401  —  HTTP 401
+PASS  8. Unauthenticated /api/users → 401  —  HTTP 401
+PASS  8. Unauthenticated /api/coordination → 401  —  HTTP 401
+PASS  9a. /api/auth/demo-login is refused in a normal configuration  —  HTTP 403
+PASS  9b. Session payload exposes no demo accounts in a normal configuration  —  demoMode=false accounts=0
+PASS  9c. Session payload leaks no demo password
+PASS  9d. Public metadata does not disclose demo credentials
+PASS  9e. A forged bearer token is rejected → 401  —  HTTP 401
+PASS  10a. Client-supplied role/bureau/region does not widen grant authority → 403  —  HTTP 403
+PASS  10b. Query-string role/bureau hints do not reveal foreign contents  —  29 rows
+PASS  10c. Administrative configuration change refused for a bureau lead → 403  —  HTTP 403
+PASS  11a. Denied access attempts are recorded in the security log  —  36 denial entries
+PASS  11b. Denials are recorded for the foreign grant attempt  —  admin_config_denied path=/api/system/worker/tick role=bureau_lead bureau=RB region=South g
+PASS  11c. Denials are recorded for the reviewer upload and mutation attempts  —  access_denied_audit, access_denied
+PASS  11d. Denial entries carry no complaint text or contact details
+PASS  11e. Authorised grant and upload are preserved in business history  —  10 events
+
+63/63 checks passed
+M1 security regressions: PASS
+
+=============== M1 demo-mode checks (demo explicitly enabled) ===============
+PASS  10a. Demo instance reports demoMode=true  —  demoMode=true
+PASS  10b. Demo accounts are published only in this configuration  —  6 accounts
+PASS  10c. Passwordless fixture entry works → 200  —  HTTP 200
+PASS  10d. Fixture entry lands as the requested account  —  l.verma
+PASS  10e. The fixture session is authenticated and usable
+PASS  10f. Fixture accounts are still bound by the permission rules → 403  —  HTTP 403
+PASS  10g. Switching fixture identity does not invalidate the earlier session
+PASS  10h. Password sign-in also works in the demo instance  —  HTTP 200
+
+8/8 checks passed
+Demo-mode checks: PASS
+
+=============== Acceptance suite T01–T12 (normal instance) ===============
+CaseLink acceptance run against http://127.0.0.1:8091
+
+PASS  T01  Same institution with active cases in RB and PGRC yields one coordination alert listing both cases  —  alert 95e36772, bureaus PGRC+PGRC+PGRC+PGRC+RB+RB+RB+RB, cases 8
+PASS  T02  Institution alert appears for unrelated topics; no institution-only duplicate claim  —  alert present=true, duplicate(cert,infra)=false, all suggestions carry >=2 reasons=true
+PASS  T03  Identical wording at different institution IDs produces no duplicate relationship  —  kaveri case PGRC-2026-00005 vs vaigai case PGRC-2026-00001: suggestion present=false
+PASS  T04  Ambiguous college name stays in triage; no speculative canonical merge  —  triage case PGRC-2026-00009, excluded from overlap=true, suggestions are advisory only=true
+PASS  T05a  Cross-bureau case read is denied or fully masked for a bureau officer  —  HTTP 200 (coordination metadata only, complaint text absent)
+PASS  T05b  Region scope is enforced for the same bureau  —  HTTP 403 for a West-region case read by a South officer
+PASS  T05c  Restricted rows in list responses never carry complaint text
+PASS  T06  Reviewer links then revokes two cases; both stay intact with recorded reasons and actors  —  suggestion found=true, link HTTP 200, revoke HTTP 200, owners unchanged=true
+PASS  T07  Pending, rejected and accepted transfer each keep exactly one owner and are all recorded  —  pending owner PGRC=true, reject kept PGRC=true, accepted owner RB, repeat accept HTTP 409
+PASS  T08  No policy means no invented deadline; configured approaching/overdue reminders follow the stored due time  —  no-deadline case RB-2026-00023 (state not_applicable), overdue 4, approaching 4
+PASS  T09  Dispose and reopen keep the earlier outcome and original receipt time; alerts follow active state  —  disposed=Disposed, reopened=Under review, receipt preserved=true, prior disposal event kept=true
+PASS  T10  Repeat import or retried mutation creates no duplicate case, transfer or notification  —  idempotent replay same case=true, first commit accepted 1/rejected 1/skipped 1, repeat accepted 0/skipped 2
+PASS  T11  Two editors saving the same version: one saves, the stale edit reports a conflict  —  first save 201, stale save 409, version now 2
+PASS  T12  Failure during mutation and audit commit rolls back atomically; invalid state change rejected  —  invalid transition HTTP 422, inject=200, injected failure HTTP 500, version 1→1, no partial event=true
+PASS  S01  Unauthenticated API read is refused  —  HTTP 401
+PASS  S02  A bureau or role claimed in the request body cannot widen scope  —  HTTP 403
+PASS  S03  Read-only reviewer sees only granted records and cannot mutate a case  —  read HTTP 403, write HTTP 403
+PASS  S04  Attachment download through another case is refused  —  HTTP 404
+PASS  S05  CSV export escapes spreadsheet formula-like values and carries snapshot/filter metadata  —  cell prefixed=true, header=# CaseLink export snapshot=2026-10-27T19
+PASS  S06  Report totals reconcile with the drill-down case lists  —  overdue 6/6, pending 61/61
+PASS  S07  Matching outage still saves the case, keeps rule-based overlap detection and shows matching status  —  case saved 201, mode reported unavailable
+
+21/21 checks passed.
+
+=============== Sign-in suite (normal instance) ===============
+PASS  Normal sign-in reaches My work  —  heading "My work"
+PASS  My work renders its queue tiles  —  6 tiles
+PASS  No console or page errors
+PASS  Cookies cleared (simulating a blocked cookie)
+PASS  Bearer token keeps the session alive without cookies  —  login form present: false
+PASS  Cases load with the token-only session  —  25 rows
+PASS  Reload without cookies stays signed in
+PASS  Sign out returns to the sign-in screen
+PASS  After sign out, protected routes ask for sign-in again
+PASS  Wrong password shows an error, not a silent failure  —  Something needs attentionUsername or password is incorrect.
+PASS  No demo account shortcuts in a normal configuration
+PASS  No demo password hints in a normal configuration
+PASS  Opening the app does not create a session in a normal configuration  —  0 cookies
+PASS  A protected route without sign-in shows the sign-in screen
+
+All sign-in checks passed.
+
+=============== Direct-entry suite (demo instance) ===============
+PASS  Opening the app lands directly in the workspace
+PASS  Default page is My work
+PASS  Signed in as the bureau lead by default  —  Bureau lead · PGRC
+PASS  Account switcher is present in the header
+PASS  Switching account changes the session  —  Supervisor · Cross-bureau
+PASS  ?as=p.rao enters as that account  —  Priya Rao · Bureau officer · PGRC
+PASS  Cases screen still loads for the chosen account  —  25 rows
+PASS  Sign out shows the login page
+PASS  After sign out, a protected route asks for sign-in
+PASS  Login page offers a direct-entry button
+PASS  Direct-entry button opens the workspace  —  heading "My work"
+PASS  #/login shows the sign-in page even with a session
+PASS  No console or page errors during the flow
+
+All direct-entry checks passed.
+
+=============== Interface smoke / screenshots (normal instance, explicit sign-in) ===============
+captured 01-my-work
+captured 02-institutions
+captured 03-institution-profile
+captured 06-cases
+captured 07-case-workspace
+action save: saved
+captured 07b-action-saved
+captured 04-coordination
+captured 05-relationship-review
+captured 08-reports
+captured 09-alerts
+captured 10-import
+captured 11-settings
+captured 12-coordination-supervisor
+captured 12b-supervisor-review
+captured 15-restricted-case
+captured 16-reviewer-scope
+captured 13-mobile-my-work
+captured 13b-mobile-cases
+captured 14-narrow-desktop
+
+console errors: 0
+
+M1 verification: ALL SUITES PASSED

@@ -1,0 +1,47 @@
+{
+  "name": "caselink",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "CaseLink - SIH26264 institution complaint coordination prototype (synthetic data only)",
+  "scripts": {
+    "build": "vite build",
+    "start": "npm run build && tsx server/src/index.ts",
+    "serve": "tsx server/src/index.ts",
+    "dev": "tsx server/src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "seed": "tsx server/src/seed.ts --force",
+    "test:acceptance": "node test/acceptance.mjs",
+    "test:ui": "node test/ui-smoke.mjs",
+    "bench": "node test/bench.mjs",
+    "test:login": "node test/login-check.mjs",
+    "setup": "bash start.sh --setup-only || true",
+    "test:direct": "node test/direct-entry.mjs",
+    "test:security": "node test/security-m1.mjs",
+    "test:demo": "node test/demo-mode.mjs",
+    "test:m1": "bash test/run-m1.sh",
+    "test:regional": "node test/security-m1-1.mjs"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "better-sqlite3": "^11.5.0",
+    "express": "^4.21.1",
+    "multer": "^2.5.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^20.17.6",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "playwright": "^1.48.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}
