@@ -142,7 +142,7 @@ export default function SupervisorReviewScreen({ focus }: { focus?: string }) {
       </div>
       <section className="m3-card m3-decision-panel">
         <div><h2>Supervisor action</h2><p className="m3-muted">Review actions do not decide whether complaints are Same, Related or Separate.</p></div>
-        {detail.review.state==='accepted' ? <p className="m3-accepted">✓ Accepted for M4 relationship decision. Both original complaints remain unchanged.</p>:
+        {detail.review.state==='accepted' ? <p className="m3-accepted">✓ Accepted for M4 relationship decision. Both original complaints remain unchanged.<button type='button' className='m3-primary-btn' onClick={()=>go('#/relationship-decision/'+detail.id)}>Proceed to Relationship Decision →</button></p>:
         <div className="m3-review-form">
           <label htmlFor="m3-action">Review outcome</label>
           <select id="m3-action" value={action} onChange={e=>setAction(e.target.value as ReviewAction)}>
