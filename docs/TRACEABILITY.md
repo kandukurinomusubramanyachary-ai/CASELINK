@@ -78,7 +78,7 @@ shared permission layer used by both routes and services.
 | --- | --- | --- |
 | FR01 canonical permanent ID, separate internal UUID, reviewed aliases, fuzzy = suggestion only, unresolved ⇒ triage and excluded from overlap | `institutions` + `institution_aliases` tables, `/institutions/resolve`, `triage_state` | T04 |
 | FR02 required-field/date/officer validation, server-generated identifiers, received ≠ import time, corrections record old/new values, no silent delete | `createCase` + `updateCase` (before/after objects in `action_events`) | T11, history in screenshots |
-| FR03 template, preview, per-row errors, commit, 500-row cap, only valid rows imported, accepted/rejected/skipped reported, stable external reference required, repeat protection | `/import/preview`, `/import/:batchId/commit`, unique index on (`source_channel`, `bureau`, `source_reference`) | T10 |
+| FR03 template, preview, per-row errors, commit, 500-row cap, only valid rows imported, accepted/rejected/skipped reported, stable external reference required, repeat protection | `/import/preview`, `/import/:batchId/commit`, unique index on normalized `source_identity` (`source_system | bureau | source_reference`) | T10, M5 import suite, migration 8 |
 | FR04 PDF/PNG/JPEG, 5 × 10 MB, server-side actual-type validation, private storage, authorised download, uploader/time/hash | `attachments` table, magic-byte check, SHA-256, uploads outside the web root | S04 |
 
 ## Section 5 — Lifecycle and ownership
@@ -141,12 +141,14 @@ shared permission layer used by both routes and services.
 
 ## Section 10 — Acceptance tests
 
-All twelve PRD scenarios (T01–T12) are automated in `test/acceptance.mjs` and currently pass, together
-with seven supplementary checks. See [`TEST-RESULTS.md`](TEST-RESULTS.md).
+All twelve PRD scenarios (T01–T12) are automated in `test/acceptance.mjs` and pass on the Milestone 0
+candidate, together with supplementary checks. See [`BASELINE.md`](BASELINE.md) for the exact commit and
+current evidence; older result documents are historical reports.
 
-**Not done:** the matching-evaluation fixture set (60 complaints, 120 labelled pairs, tuning/held-out
-split, precision/recall). The rule baseline that such an evaluation would compare against exists, but no
-metric is claimed.
+The matching evaluation now runs in the required gate with 60 complaints, 120 labelled pairs and
+fingerprinted tune/held-out splits. On this synthetic set, duplicate precision/recall are 100%/100% and
+related precision/recall are 100%/97.5% (one related pair missed). These are fixture measurements, not
+real-world accuracy claims or proof of a P1 semantic-matching target.
 
 ---
 

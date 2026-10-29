@@ -396,14 +396,29 @@ let grantWorked = false;
   const after = await caseOf('l.verma', rbWorkable.id);
   check('6z. Case record unchanged after the denied mutations', after?.version === version && after?.nextAction !== 'Reviewer attempted edit', `version ${version} → ${after?.version}`);
 
-  // Personal notification acknowledgement is not shared state: allowed.
-  const notes = (await api('/api/notifications', { token: reviewer.token })).data?.notifications ?? [];
-  if (notes.length) {
-    const ack = await api(`/api/notifications/${notes[0].id}/acknowledge`, { method: 'POST', token: reviewer.token, body: {} });
-    check('6y. Reviewer may acknowledge their own notification (personal, not shared state) → 200', ack.status === 200, `HTTP ${ack.status}`);
-  } else {
-    check('6y. Reviewer may acknowledge their own notification (personal, not shared state) — no notification fixture', true, 'skipped');
+  // Personal notification acknowledgement is not shared state: allowed. Create a synthetic personal
+  // notice when the seed has none so this required check can never be reported as a passing skip.
+  let notes = (await api('/api/notifications', { token: reviewer.token })).data?.notifications ?? [];
+  if (!notes.length) {
+    const fixture = new Database(process.env.CASELINK_DB ?? 'data/caselink.db');
+    fixture.prepare(`INSERT INTO notifications
+      (id,user_id,kind,entity_type,entity_id,dedupe_key,title,body,created_at)
+      VALUES ('m1-reviewer-personal-notice',?,'review','personal','m1-reviewer-ack',
+        'm1:reviewer-personal-notice','Synthetic review reminder','Acknowledge this synthetic personal notice.',?)`)
+      .run(reviewer.id, new Date().toISOString());
+    fixture.close();
+    notes = (await api('/api/notifications', { token: reviewer.token })).data?.notifications ?? [];
   }
+  const notice = notes[0];
+  const ack = await api(`/api/notifications/${notice.id}/acknowledge`, { method: 'POST', token: reviewer.token, body: {} });
+  const acknowledgementDb = requireDb();
+  const persisted = acknowledgementDb.prepare('SELECT acknowledged_at FROM notifications WHERE id = ? AND user_id = ?').get(notice.id, reviewer.id);
+  acknowledgementDb.close();
+  check(
+    '6y. Reviewer may acknowledge their own notification (personal, not shared state) → 200 and persisted',
+    ack.status === 200 && Boolean(persisted?.acknowledged_at),
+    `HTTP ${ack.status} persisted=${Boolean(persisted?.acknowledged_at)}`
+  );
 }
 
 /* ======================================================================
@@ -438,7 +453,7 @@ let grantWorked = false;
     });
     check('7d. Assigned officer can upload evidence to their own case → 201', r2.status === 201, `HTTP ${r2.status}`);
   } else {
-    check('7d. Assigned officer upload path available — no assigned officer case fixture', true, 'skipped');
+    skipCheck('7d. Assigned officer upload path available', 'no assigned officer case fixture');
   }
 }
 
@@ -549,8 +564,8 @@ if (skipped.length) {
   console.log(`${skipped.length} skipped (not counted as passes):`);
   for (const s of skipped) console.log(` - ${s.name}: ${s.why}`);
 }
-if (failures) {
-  console.log(`${failures} FAILED`);
+if (failures || skipped.length) {
+  console.log(`${failures} FAILED; ${skipped.length} REQUIRED CHECKS SKIPPED`);
   process.exit(1);
 }
 console.log('M1 security regressions: PASS');

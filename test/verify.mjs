@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
+import { countRequiredSkips } from './required-checks.mjs';
 
 const repo = path.resolve(import.meta.dirname, '..');
 fs.mkdirSync(path.join(repo, '.runtime'), { recursive: true });
@@ -31,7 +32,7 @@ async function command(name, args, env = {}) {
   clearTimeout(timeout); children.delete(child);
   const log = path.join(output, `${name}.log`);
   fs.writeFileSync(log, text);
-  const skipped = (text.match(/^\s*SKIP\b/gm) ?? []).length;
+  const skipped = countRequiredSkips(text);
   const ok = code === 0 && skipped === 0;
   results.push({ name, code, skipped, ok, log: path.relative(repo, log) });
   console.log(`${ok ? 'PASS' : 'FAIL'} ${name}${skipped ? ` (${skipped} required checks skipped)` : ''}`);
@@ -63,7 +64,7 @@ async function apiSuite(file, demo = false) {
       await new Promise(resolve => setTimeout(resolve, 50));
     }
     await command(name, [file, ...(name === 'acceptance' ? [env.BASE] : [])], env);
-    if (name === 'import-m5') await command('migration-check', ['test/migration-check.mjs', env.CASELINK_DB], env);
+    if (name === 'import-m5') await command('migration-check', ['test/migration-check.mjs', env.CASELINK_DB, '--simulate-pre-m3'], env);
   } finally {
     await stop(child);
     fs.writeFileSync(path.join(output, `${name}-server.log`), text);
