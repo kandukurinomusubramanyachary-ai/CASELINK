@@ -133,6 +133,7 @@ function details(c:Context) {
   const draft=db.prepare(
     'SELECT decision,reason_category,reason,version,updated_at FROM m4_drafts WHERE handoff_id=?'
   ).get(c.handoffId) as DraftRow|undefined;
+  const active=activeDecision(c.pairKey);
   return {
     handoffId:c.handoffId,suggestionId:c.suggestionId,
     suggestionState:c.suggestionState,
@@ -140,13 +141,15 @@ function details(c:Context) {
     pairKey:c.pairKey,caseA:caseView(c.a),caseB:caseView(c.b),
     draft:draft ? {decision:draft.decision,reason:draft.reason,
       reasonCategory:draft.reason_category,version:draft.version,updatedAt:draft.updated_at} : null,
-    activeDecision:activeDecision(c.pairKey) ? projectDecision(activeDecision(c.pairKey)!) : null,
+    activeDecision:active ? projectDecision(active) : null,
     decisions:allDecisions(c).map(projectDecision),
     auditEvents:auditEvents(c),
     // M5 consumes a constrained summary after approval; M5 is NOT implemented here.
-    assignmentBoundary: activeDecision(c.pairKey)?.state==='confirmed' ? {
+    // Only a positive Same/Related link has a pair-level assignment boundary.
+    // A Separate decision must NOT promote independent complaints as one M5 item.
+    assignmentBoundary: active && active.decision!=='Separate' ? {
       status:'available_for_future_m5',pairKey:c.pairKey,caseIds:[c.a.id,c.b.id],
-      relationshipDecisionId:activeDecision(c.pairKey)!.id,
+      relationshipDecisionId:active.id,
     } : null,
   };
 }
