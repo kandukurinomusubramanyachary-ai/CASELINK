@@ -254,7 +254,7 @@ export function registerM4Routes(app:Express):void {
       // independent case history events, and suggestion/relationship persistence.
       const existing=decideRelationship(user,latest.suggestionId,mapped,body.reason,{
         caseA:body.caseAVersion,caseB:body.caseBVersion,
-      });
+      },true);
       const id=uid(),at=nowIso();
       db.prepare(
         'INSERT INTO m4_decisions(id,handoff_id,suggestion_id,pair_key,decision,reason_category,reason,'+
@@ -299,7 +299,7 @@ export function registerM4Routes(app:Express):void {
       if(row.relationship_id){
         revokeRelationship(user,row.relationship_id,body.reason,{
           caseA:body.caseAVersion,caseB:body.caseBVersion,
-        });
+        },true);
       }else{
         for(const [a,b] of [[latest.a,latest.b],[latest.b,latest.a]]){
           const changed=db.prepare(
