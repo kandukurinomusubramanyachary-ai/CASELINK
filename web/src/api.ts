@@ -434,6 +434,10 @@ export const api = {
   m2Handoff: (id: string, supervisorId: string, reason: string, caseAVersion: number, caseBVersion: number) =>
     post<{ handoffId: string; sentAt: string; state: string }>('/m2/suggestions/' + encodeURIComponent(id) + '/handoff',
       { supervisorId, reason, caseAVersion, caseBVersion }),
+  m3Reviews: () => get<unknown>('/m3/reviews'),
+  m3Review: (id: string) => get<unknown>(`/m3/reviews/${encodeURIComponent(id)}`),
+  m3ReviewAction: (id: string, action: string, reason: string, expectedVersion: number) =>
+    post<unknown>(`/m3/reviews/${encodeURIComponent(id)}/actions`, { action, reason, expectedVersion }),
   coordination: () => get<{ overlaps: CoordinationAlert[]; matchingMode: string; ruleVersion: string }>('/coordination'),
   acknowledgeAlert: (id: string) => post<{ ok: true }>(`/alerts/${id}/acknowledge`),
   decideSuggestion: (id: string, decision: string, reason: string, caseAVersion?: number, caseBVersion?: number) =>
@@ -457,4 +461,22 @@ export const api = {
 
 export async function downloadCsv(url: string, filename: string): Promise<void> {
   return downloadFile(url, filename);
+}
+
+/** Evidence bytes require an authenticated API fetch; never expose private file paths or public URLs. */
+export async function m3EvidenceBlob(handoffId: string, attachmentId: string): Promise<Blob> {
+  const res = await fetch(`/api/m3/reviews/${encodeURIComponent(handoffId)}/evidence/${encodeURIComponent(attachmentId)}`, {
+    credentials: 'include',
+    headers: authHeaders(),
+    cache: 'no-store',
+  });
+  if (!res.ok) {
+    if (res.status === 401) {
+      setAuthToken(null);
+      announceSessionExpired();
+    }
+    throw new ApiError(res.status, 'evidence_unavailable',
+      res.status === 403 || res.status === 404 ? 'Evidence is not available in your current authorization scope.' : 'Unable to load evidence.');
+  }
+  return res.blob();
 }

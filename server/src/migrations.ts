@@ -290,6 +290,34 @@ export const MIGRATIONS: Migration[] = [
       db.exec('CREATE INDEX IF NOT EXISTS m2_handoffs_supervisor_idx ON m2_review_handoffs(supervisor_id, sent_at)');
     },
   },
+  {
+    version: 10,
+    name: 'm3_supervisor_review_ledger',
+    up: () => {
+      db.exec(`CREATE TABLE IF NOT EXISTS m3_reviews (
+        id TEXT PRIMARY KEY,
+        handoff_id TEXT NOT NULL UNIQUE REFERENCES m2_review_handoffs(id),
+        state TEXT NOT NULL CHECK (state IN ('pending','needs_review','awaiting_evidence','accepted')),
+        note TEXT,
+        version INTEGER NOT NULL DEFAULT 0,
+        updated_at TEXT NOT NULL,
+        accepted_at TEXT
+      )`);
+      db.exec(`CREATE TABLE IF NOT EXISTS m3_review_events (
+        id TEXT PRIMARY KEY,
+        handoff_id TEXT NOT NULL REFERENCES m2_review_handoffs(id),
+        actor_id TEXT NOT NULL REFERENCES users(id),
+        action TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        from_state TEXT NOT NULL,
+        to_state TEXT NOT NULL,
+        at TEXT NOT NULL,
+        version_after INTEGER NOT NULL
+      )`);
+      db.exec('CREATE INDEX IF NOT EXISTS m3_review_events_by_handoff ON m3_review_events(handoff_id, at)');
+    },
+  },
+
 ];
 
 /** Apply every migration whose version is not yet recorded. Safe to call repeatedly. */
