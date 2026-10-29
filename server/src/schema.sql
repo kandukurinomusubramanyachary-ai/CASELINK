@@ -354,3 +354,63 @@ CREATE TABLE IF NOT EXISTS m3_review_events (
   version_after INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS m3_review_events_by_handoff ON m3_review_events(handoff_id, at);
+
+
+-- M4: durable drafts, canonical confirmed decisions and append-only audit entries.
+CREATE TABLE IF NOT EXISTS m4_drafts (
+  handoff_id TEXT PRIMARY KEY REFERENCES m2_review_handoffs(id),
+  actor_id TEXT NOT NULL REFERENCES users(id),
+  decision TEXT NOT NULL CHECK(decision IN ('Same','Related','Separate')),
+  reason_category TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  version INTEGER NOT NULL DEFAULT 1,
+  updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS m4_decisions (
+  id TEXT PRIMARY KEY,
+  handoff_id TEXT NOT NULL REFERENCES m2_review_handoffs(id),
+  suggestion_id TEXT NOT NULL REFERENCES suggestions(id),
+  pair_key TEXT NOT NULL,
+  decision TEXT NOT NULL CHECK(decision IN ('Same','Related','Separate')),
+  reason_category TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  relationship_id TEXT REFERENCES relationships(id),
+  reviewer_id TEXT NOT NULL REFERENCES users(id),
+  state TEXT NOT NULL CHECK(state IN ('confirmed','reversed')),
+  version INTEGER NOT NULL DEFAULT 1,
+  decided_at TEXT NOT NULL,
+  reversed_by TEXT REFERENCES users(id),
+  reversed_at TEXT,
+  reversed_reason TEXT
+);
+CREATE UNIQUE INDEX IF NOT EXISTS m4_one_active_pair
+  ON m4_decisions(pair_key) WHERE state='confirmed';
+CREATE INDEX IF NOT EXISTS m4_decisions_by_handoff
+  ON m4_decisions(handoff_id,decided_at);
+CREATE TABLE IF NOT EXISTS m4_decision_events (
+  id TEXT PRIMARY KEY,
+  handoff_id TEXT NOT NULL REFERENCES m2_review_handoffs(id),
+  decision_id TEXT REFERENCES m4_decisions(id),
+  actor_id TEXT NOT NULL REFERENCES users(id),
+  action TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  from_state TEXT NOT NULL,
+  to_state TEXT NOT NULL,
+  at TEXT NOT NULL,
+  version_after INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS m4_events_handoff ON m4_decision_events(handoff_id,at);
+CREATE TRIGGER IF NOT EXISTS m4_events_no_update
+BEFORE UPDATE ON m4_decision_events BEGIN SELECT RAISE(ABORT,'m4 audit events are immutable'); END;
+CREATE TRIGGER IF NOT EXISTS m4_events_no_delete
+BEFORE DELETE ON m4_decision_events BEGIN SELECT RAISE(ABORT,'m4 audit events are immutable'); END;
+CREATE TABLE IF NOT EXISTS m4_idempotency (
+  id TEXT PRIMARY KEY,
+  actor_id TEXT NOT NULL REFERENCES users(id),
+  scope TEXT NOT NULL,
+  key TEXT NOT NULL,
+  request_hash TEXT NOT NULL,
+  response_json TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  UNIQUE(actor_id,scope,key)
+);
