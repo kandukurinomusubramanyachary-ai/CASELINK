@@ -34,6 +34,15 @@ for(const [i,summary] of [
   assert.equal(res.status,201,JSON.stringify(res.data));
   cases.push(res.data);
 }
+// A handoff is not a content grant: the owning lead must authorize the
+// recipient to inspect BOTH complaint records before supervisor review.
+for (const c of cases) {
+  const grant=await request('POST','/cases/'+c.id+'/grants',lead,{
+    version:c.version,userId:'u-supervisor',note:'Authorize synthetic M3 supervisor review.',
+    revoke:false,
+  });
+  assert.equal(grant.status,200,JSON.stringify(grant.data));
+}
 let pair;
 for(let i=0;i<90;i++){
   const r=await request('GET','/m2/suggestions?state=open&caseId='+cases[0].id+'&pageSize=50',lead);
