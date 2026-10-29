@@ -1,0 +1,65 @@
+name: M3 focused API and browser gates
+on:
+  push:
+    branches: [feat/m3-supervisor-review-secure]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  m3-focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck && npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: M3 isolated API security and database assertions
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CASELINK_DATA_DIR="$RUNNER_TEMP/m3-api-data"
+          export CASELINK_DB="$CASELINK_DATA_DIR/caselink.db"
+          export CASELINK_DEMO=false CASELINK_TEST_HOOKS=true
+          export BASE=http://127.0.0.1:8097 PORT=8097
+          mkdir -p "$CASELINK_DATA_DIR"
+          node --import tsx server/src/seed.ts --force
+          node --import tsx server/src/index.ts > "$RUNNER_TEMP/m3-api-server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in {1..100}; do
+            if curl -fsS "$BASE/api/system/health" >/dev/null 2>&1; then break; fi
+            if ! kill -0 "$server_pid" 2>/dev/null; then cat "$RUNNER_TEMP/m3-api-server.log"; exit 1; fi
+            sleep .2
+          done
+          node test/m3-supervisor.mjs
+      - name: M3 Playwright desktop/mobile
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CASELINK_DATA_DIR="$RUNNER_TEMP/m3-ui-data"
+          export CASELINK_DB="$CASELINK_DATA_DIR/caselink.db"
+          export CASELINK_DEMO=false CASELINK_TEST_HOOKS=true
+          export BASE=http://127.0.0.1:8098 PORT=8098
+          export CASELINK_SCREENSHOT_DIR="$RUNNER_TEMP/m3-screenshots"
+          mkdir -p "$CASELINK_DATA_DIR" "$CASELINK_SCREENSHOT_DIR"
+          node --import tsx server/src/seed.ts --force
+          node --import tsx server/src/index.ts > "$RUNNER_TEMP/m3-ui-server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in {1..100}; do
+            if curl -fsS "$BASE/api/system/health" >/dev/null 2>&1; then break; fi
+            if ! kill -0 "$server_pid" 2>/dev/null; then cat "$RUNNER_TEMP/m3-ui-server.log"; exit 1; fi
+            sleep .2
+          done
+          node test/m3-ui.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m3-focused-screenshots
+          path: ${{ runner.temp }}/m3-screenshots/*.png
+          if-no-files-found: ignore
