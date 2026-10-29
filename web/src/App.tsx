@@ -63,6 +63,7 @@ const NAV: { id: string; label: string; icon: IconName }[] = [
   { id: 'institutions', label: 'Institutions', icon: 'institution' },
   { id: 'cases', label: 'Cases', icon: 'cases' },
   { id: 'coordination', label: 'Coordination', icon: 'coordination' },
+  { id: 'overlaps', label: 'Overlap detection', icon: 'coordination' },
   { id: 'alerts', label: 'Alerts', icon: 'bell' },
   { id: 'reports', label: 'Reports', icon: 'reports' },
 ];
@@ -448,6 +449,7 @@ function titleFor(name: string): string {
       cases: 'Cases',
       case: 'Case workspace',
       coordination: 'Coordination review',
+      overlaps: 'Intelligent overlap detection',
       'coordination-focus': 'Coordination review',
       alerts: 'Alerts and notifications',
       reports: 'Reports',
@@ -552,6 +554,7 @@ import { InstitutionsScreen, InstitutionDetailScreen } from './screens/Instituti
 import CasesScreen from './screens/Cases';
 import CaseWorkspace from './screens/CaseWorkspace';
 import CoordinationScreen from './screens/Coordination';
+import OverlapDetectionScreen from './screens/OverlapDetection';
 import AlertsScreen from './screens/Alerts';
 import ReportsScreen from './screens/Reports';
 import ImportScreen from './screens/Import';
@@ -569,6 +572,8 @@ function RouteView({ match }: { route: string; match: ReturnType<typeof matchRou
       return <CasesScreen initialQuery={match.query} />;
     case 'case':
       return <CaseWorkspace id={match.param!} />;
+    case 'overlaps':
+      return <OverlapDetectionScreen />;
     case 'coordination':
     case 'coordination-focus':
       return <CoordinationScreen focus={match.param} />;
