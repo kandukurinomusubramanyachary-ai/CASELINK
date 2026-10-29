@@ -39,9 +39,11 @@ M3 **does not** create a Same/Related/Separate decision; M4 must enforce the acc
 1. Run `npm ci` and `npm run seed` against a fresh, isolated `CASELINK_DATA_DIR`.
 2. Start server with `CASELINK_DEMO=false npm run dev`; demo user password for seeded fixtures is
    `caselink-demo` (never use seeded demo accounts with real complaints).
-3. Sign in as seeded bureau lead `m.nair` and use M2 Overlap Detection to send a
-   South-region candidate to supervisor `a.desai`.
-4. Sign out and sign in as `a.desai`, open `#/supervisor-review` and select the assigned pair.
+3. Sign in as seeded bureau lead `m.nair`; **before handoff**, grant supervisor `a.desai`
+   explicit content-read access to **both** complaints using each case's access-management controls.
+   An M2 handoff does **not** confer content access.
+4. Use M2 Overlap Detection to send the South-region candidate to `a.desai`.
+   Then sign in as `a.desai`, open `#/supervisor-review` and select the assigned pair.
 5. Inspect evidence and both timelines. Use Request More Evidence with a detailed reason.
    Verify `awaiting_evidence` and a persisted audit entry. Resume and accept for decision.
 6. Sign in as officer `p.rao` and West supervisor `v.kumar`; direct M3 routes
