@@ -279,6 +279,17 @@ export const MIGRATIONS: Migration[] = [
       db.exec('CREATE UNIQUE INDEX IF NOT EXISTS cases_import_identity ON cases(source_identity) WHERE source_identity IS NOT NULL');
     },
   },
+  {
+    version: 9,
+    name: 'm2_supervisor_review_handoff',
+    up: () => {
+      db.exec('CREATE TABLE IF NOT EXISTS m2_review_handoffs (' +
+        'id TEXT PRIMARY KEY, suggestion_id TEXT NOT NULL REFERENCES suggestions(id), ' +
+        'sent_by TEXT NOT NULL REFERENCES users(id), supervisor_id TEXT NOT NULL REFERENCES users(id), ' +
+        'reason TEXT NOT NULL, sent_at TEXT NOT NULL, UNIQUE(suggestion_id, supervisor_id))');
+      db.exec('CREATE INDEX IF NOT EXISTS m2_handoffs_supervisor_idx ON m2_review_handoffs(supervisor_id, sent_at)');
+    },
+  },
 ];
 
 /** Apply every migration whose version is not yet recorded. Safe to call repeatedly. */
