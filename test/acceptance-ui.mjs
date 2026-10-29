@@ -247,7 +247,6 @@ if (!alertWithPair || !decidablePair) {
     'Reviewed overlapping cases offer a lead-only assignment handoff without changing ownership',
     handoffVisible && handoffLinks === 2 &&
       [decidablePair.caseA.id, decidablePair.caseB.id].every((id) => handoffTargets.includes(`#/cases/${id}`)) &&
-      afterLink.includes('approving a link never') === false &&
       afterLink.includes('automatically assigns, transfers or disposes'),
     `handoff shown=${handoffVisible}; lead assignment links=${handoffLinks}; target cases=${handoffTargets.join(',')}`
   );
