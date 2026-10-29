@@ -13,6 +13,7 @@
  *  - `schema.sql` stays the authoritative description of a *fresh* database, and both paths must agree.
  */
 import { db } from './db.js';
+import { importIdentity } from './csv.js';
 
 /**
  * Local timestamp helper: this module is imported *by* `db.js` while that module is still
@@ -216,10 +217,11 @@ export const MIGRATIONS: Migration[] = [
         db.prepare('INSERT INTO migration_notes (id, version, at, subject, detail) VALUES (?,?,?,?,?)').run(
           `note-${Math.random().toString(36).slice(2, 10)}`,
           6,
+          nowIso(),
           'relationship history without a resolvable pair',
           `${unresolved.length} legacy relationship history event(s) could not be paired with the other case ` +
-            `(relationship id or paired case number missing). Their remarks are withheld from every reader ` +
-            `except the one who can read both cases, and the case itself is unchanged.`
+            `(relationship id or paired case number missing). Their remarks are withheld until the pair can be resolved, ` +
+            `and the case itself is unchanged.`
         );
       }
     },
@@ -239,11 +241,42 @@ export const MIGRATIONS: Migration[] = [
         db.prepare('INSERT INTO migration_notes (id, version, at, subject, detail) VALUES (?,?,?,?,?)').run(
           `note-${Math.random().toString(36).slice(2, 10)}`,
           7,
+          nowIso(),
           'interrupted evidence publication',
           `${interrupted.n} attachment row(s) were left in a non-published state by an interrupted upload. ` +
             'They are not offered for download and are reconciled at the next start.'
         );
       }
+    },
+  },
+  {
+    version: 8,
+    name: 'submission_canonical_import_identity',
+    up: () => {
+      // The old index omitted source_system and rejected valid imports from a second register.
+      // This runs after the provenance columns exist, including on pre-M3 databases.
+      db.exec('DROP INDEX IF EXISTS cases_import_dedupe');
+      const rows = db.prepare(`SELECT id, source_system, bureau, source_reference, source_identity
+        FROM cases WHERE source_channel = 'CSV import' ORDER BY id`).all() as {
+        id: string; source_system: string | null; bureau: string; source_reference: string | null; source_identity: string | null;
+      }[];
+      const seen = new Set<string>();
+      for (const row of rows) {
+        const identity = row.source_identity ?? importIdentity(row.source_system ?? '', row.bureau, row.source_reference ?? '');
+        if (identity && seen.has(identity)) {
+          // Preserve every legacy record. One canonical row reserves the identity; ambiguous extras
+          // remain explicitly unresolved and appear in the migration report for manual reconciliation.
+          db.prepare('UPDATE cases SET source_identity = NULL WHERE id = ?').run(row.id);
+          db.prepare('INSERT INTO migration_notes (id,version,at,subject,detail) VALUES (?,?,?,?,?)').run(
+            `note-import-collision-${row.id}`, 8, nowIso(), row.id,
+            'Legacy imported records share a normalized identity. This record was preserved without an identity; reconcile the provenance manually.'
+          );
+        } else if (identity) {
+          seen.add(identity);
+          db.prepare('UPDATE cases SET source_identity = ? WHERE id = ?').run(identity, row.id);
+        }
+      }
+      db.exec('CREATE UNIQUE INDEX IF NOT EXISTS cases_import_identity ON cases(source_identity) WHERE source_identity IS NOT NULL');
     },
   },
 ];

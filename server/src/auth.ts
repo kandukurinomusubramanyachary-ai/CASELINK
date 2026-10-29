@@ -62,7 +62,11 @@ function parseCookies(header: string | undefined): Record<string, string> {
   for (const part of header.split(';')) {
     const idx = part.indexOf('=');
     if (idx === -1) continue;
-    out[part.slice(0, idx).trim()] = decodeURIComponent(part.slice(idx + 1).trim());
+    try {
+      out[part.slice(0, idx).trim()] = decodeURIComponent(part.slice(idx + 1).trim());
+    } catch {
+      // Malformed client cookies are not a server failure or an authenticated session.
+    }
   }
   return out;
 }
@@ -70,12 +74,12 @@ function parseCookies(header: string | undefined): Record<string, string> {
 export function setSessionCookie(res: Response, token: string): void {
   res.setHeader(
     'Set-Cookie',
-    `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; SameSite=None; Secure; Max-Age=${SESSION_HOURS * 3600}`
+    `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=${SESSION_HOURS * 3600}`
   );
 }
 
 export function clearSessionCookie(res: Response): void {
-  res.setHeader('Set-Cookie', `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=None; Secure; Max-Age=0`);
+  res.setHeader('Set-Cookie', `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0`);
 }
 
 /** Reads a session token from the Authorization header first, then from the cookie. */

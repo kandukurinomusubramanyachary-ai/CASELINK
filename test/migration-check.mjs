@@ -1,7 +1,10 @@
 /**
  * Migration regression check (M3/M5 schema).
  *
- *   node test/migration-check.mjs [path-to-existing-database]
+ *   node test/migration-check.mjs [path-to-existing-database] [--simulate-pre-m3]
+ *
+ * `--simulate-pre-m3` removes later columns/tables from the disposable copy only, providing a
+ * repeatable full v1–v8 upgrade fixture even when the supplied source is already current.
  *
  * Proves three things about a database created by an earlier build:
  *   1. the numbered migrations bring it up to the same shape as a freshly seeded database;
@@ -19,6 +22,7 @@ import Database from 'better-sqlite3';
 
 const repo = path.resolve(new URL('..', import.meta.url).pathname);
 const source = path.resolve(process.argv[2] ?? path.join(repo, 'data/caselink.db'));
+const simulatePreM3 = process.argv.includes('--simulate-pre-m3');
 
 const results = [];
 let failures = 0;
@@ -48,6 +52,40 @@ const oldPath = path.join(oldDir, 'caselink.db');
   from.exec(`VACUUM INTO '${oldPath.replace(/'/g, "''")}'`);
   from.close();
 }
+
+// Release-gate upgrade coverage: turn only the disposable copy into a pre-M3 database. This exercises
+// every numbered migration while preserving the original case IDs, versions and business history.
+// The source database remains read-only and is never changed.
+if (simulatePreM3) {
+  const legacy = new Database(oldPath);
+  legacy.exec(`
+    DROP INDEX IF EXISTS cases_import_identity;
+    DROP INDEX IF EXISTS action_events_pair_idx;
+    DROP INDEX IF EXISTS attachments_state_idx;
+    DROP INDEX IF EXISTS cases_status_idx;
+    DROP INDEX IF EXISTS cases_assigned_idx;
+    DROP INDEX IF EXISTS cases_expected_disposal_idx;
+    DROP INDEX IF EXISTS cases_updated_idx;
+    DROP TABLE IF EXISTS dispositions;
+    DROP TABLE IF EXISTS migration_notes;
+    ALTER TABLE idempotency_keys DROP COLUMN request_hash;
+    ALTER TABLE import_batches DROP COLUMN input_hash;
+    ALTER TABLE import_batches DROP COLUMN policy_snapshot_json;
+    ALTER TABLE import_batches DROP COLUMN result_json;
+    ALTER TABLE action_events DROP COLUMN paired_case_id;
+    ALTER TABLE notifications DROP COLUMN detail_json;
+    ALTER TABLE attachments DROP COLUMN state;
+    ALTER TABLE cases DROP COLUMN outcome;
+    ALTER TABLE cases DROP COLUMN decision_reference;
+    ALTER TABLE cases DROP COLUMN source_system;
+    ALTER TABLE cases DROP COLUMN source_identity;
+    CREATE UNIQUE INDEX cases_import_dedupe ON cases(source_channel,bureau,source_reference)
+      WHERE source_reference IS NOT NULL AND source_channel='CSV import';
+    DELETE FROM schema_migrations;
+  `);
+  legacy.close();
+  console.log('disposable copy downgraded to a pre-M3 schema; all migrations will be exercised');
+}
 const before = new Database(oldPath, { readonly: true });
 const beforeCases = before.prepare('SELECT id, case_number, status, version, received_at FROM cases ORDER BY id').all();
 const beforeEvents = before.prepare('SELECT COUNT(*) AS n FROM action_events').get().n;
@@ -67,7 +105,7 @@ if (!preMigration) {
 
 /* -------------------------------------------------------- 2. migrate twice */
 const run = (dataDir) =>
-  execFileSync('npx', ['tsx', 'server/src/migrate.ts'], {
+  execFileSync(process.execPath, ['--import', 'tsx', 'server/src/migrate.ts'], {
     cwd: repo,
     env: { ...process.env, CASELINK_DATA_DIR: dataDir },
     encoding: 'utf8',
@@ -80,7 +118,7 @@ check('1. the migration run reports the version it reached', /already at version
 check('2. a second run applies nothing (idempotent)', /applied: none \(already current\)/.test(secondRun), secondRun.trim().split('\n')[2]);
 
 /* -------------------------------------------------- 3. fresh database path */
-execFileSync('npx', ['tsx', 'server/src/seed.ts', '--force'], {
+execFileSync(process.execPath, ['--import', 'tsx', 'server/src/seed.ts', '--force'], {
   cwd: repo,
   env: { ...process.env, CASELINK_DATA_DIR: freshDir },
   encoding: 'utf8',

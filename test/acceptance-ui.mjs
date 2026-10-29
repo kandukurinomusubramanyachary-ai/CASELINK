@@ -264,7 +264,7 @@ await page.goto(`${BASE}/#/cases/${t07Case.id}`);
 await page.waitForTimeout(1800);
 // Scoped controls: the transfer card only, never a page-wide "first match".
 const transferCard = page.locator('.card', { hasText: 'Transfer ownership' }).first();
-await transferCard.locator('select').selectOption({ label: 'RB' });
+await transferCard.locator('select').selectOption('RB');
 await transferCard.locator('textarea').fill('T07 interface check: RB owns the related approval, so ownership should move.');
 await transferCard.locator('button:has-text("Request transfer")').click();
 await page.waitForTimeout(2500);
@@ -325,8 +325,12 @@ await switchTo(page, 'm.nair');
 await page.goto(`${BASE}/#/cases/${t09Case.id}`);
 await page.waitForTimeout(1800);
 const t09Card = page.locator('.card', { hasText: 'Record an action' }).first();
+// Assigned cases must enter review before disposition; follow the actual lifecycle in the UI.
+await t09Card.locator('select').nth(1).selectOption('Under review');
+await t09Card.locator('textarea').fill('T09 interface check: initial review completed before recording disposition.');
+await t09Card.locator('button:has-text("Save action")').click();
+await t09Card.locator('select').nth(1).selectOption('Disposed');
 await t09Card.locator('textarea').fill('T09 interface check: the complaint is upheld and the institution must reply in writing.');
-await t09Card.locator('select').nth(1).selectOption({ label: 'Disposed' });
 await page.waitForSelector('input[placeholder*="DEMO-DISP"]', { timeout: 10_000 });
 await t09Card.locator('select').nth(2).selectOption({ label: 'Upheld — corrective action directed' });
 await t09Card.locator('input[placeholder*="DEMO-DISP"]').fill('DEMO-DISP-T09-UI');

@@ -101,7 +101,8 @@ import {
   addCalendarDays,
   RULE_VERSION_LABEL,
 } from './rules.js';
-import { startWorker, runWorkerTick, drainJobs, workerState } from './worker.js';
+import { startWorker, runWorkerTick, drainJobs, workerState, jobHealth } from './worker.js';
+import { sameOriginWrites, limitLogin } from './request-security.js';
 import {
   IMPORT_COLUMNS,
   TEMPLATE_CSV,
@@ -131,8 +132,6 @@ const TEST_HOOKS = DEMO_MODE || (process.env.CASELINK_TEST_HOOKS ?? 'false') ===
 
 const app = express();
 app.disable('x-powered-by');
-app.use(express.json({ limit: '4mb' }));
-app.use(attachSession);
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'no-referrer');
@@ -140,6 +139,9 @@ app.use((req, res, next) => {
   if (req.path.startsWith('/api')) res.setHeader('Cache-Control', 'no-store');
   next();
 });
+app.use(express.json({ limit: '4mb' }));
+app.use('/api', sameOriginWrites);
+app.use(attachSession);
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024, files: 1 } });
 
@@ -300,12 +302,13 @@ function historyFor(user: SessionUser, c: CaseRecord) {
   // is only readable when the caller can read *both* cases now, so revoking a grant cannot leave the
   // other record's reason visible here (M7/A02).
   const pairedReadable = (pairedId: unknown): boolean => {
-    if (!pairedId) return true;
+    if (!pairedId) return false;
     const other = getCase(String(pairedId));
     return Boolean(other && canViewContent(user, other));
   };
   return rows.map((r) => {
-    const show = full && pairedReadable(r.pairedCaseId);
+    const relationshipEvent = ['relationship_confirmed', 'relationship_dismissed', 'relationship_revoked'].includes(String(r.actionType));
+    const show = full && (r.pairedCaseId ? pairedReadable(r.pairedCaseId) : !relationshipEvent);
     return ({
     id: r.id,
     at: r.at,
@@ -617,7 +620,8 @@ app.get('/api/search', requireAuth, wrap((req, res) => {
       e.action_type AS actionType, e.at, u.display_name AS actorName
     FROM action_events e JOIN cases c ON c.id = e.case_id
       LEFT JOIN institutions i ON i.id = c.institution_id JOIN users u ON u.id = e.actor_id
-    WHERE (${content.sql}) AND (e.paired_case_id IS NULL OR EXISTS (
+    WHERE (${content.sql}) AND ((e.paired_case_id IS NULL AND e.action_type NOT IN
+      ('relationship_confirmed','relationship_dismissed','relationship_revoked')) OR EXISTS (
       SELECT 1 FROM cases other LEFT JOIN institutions i ON i.id = other.institution_id
       WHERE other.id = e.paired_case_id AND (${paired.sql})
     )) AND (lower(e.id) LIKE ? OR lower(replace(e.action_type,'_',' ')) LIKE ? OR lower(u.display_name) LIKE ?
@@ -637,9 +641,10 @@ app.get('/api/search', requireAuth, wrap((req, res) => {
 
 app.post(
   '/api/auth/login',
+  limitLogin,
   wrap((req, res) => {
     const body = parseOrThrow(
-      z.object({ username: z.string().min(1), password: z.string().min(1) }),
+      z.object({ username: z.string().trim().min(1).max(60), password: z.string().min(1).max(256) }),
       req.body
     );
     const user = login(body.username, body.password);
@@ -759,9 +764,10 @@ app.get(
 
 app.get(
   '/api/system/status',
+  requireAuth,
   wrap((req, res) => {
     const user = req.user;
-    const jobsPending = (db.prepare(`SELECT COUNT(*) AS n FROM jobs WHERE state = 'pending'`).get() as { n: number }).n;
+    const health = jobHealth();
     res.json({
       demoMode: DEMO_MODE,
       environment: 'DEMO — synthetic institutions, people and attachments only',
@@ -771,8 +777,8 @@ app.get(
         intervalSeconds: workerState.intervalMs / 1000,
         lastRunAt: workerState.lastRunAt,
         runs: workerState.runs,
-        pendingJobs: jobsPending,
-        lastError: workerState.lastError,
+        ...health,
+        lastError: (health.lastError || workerState.lastError) ? 'Background work failed; administrator review required.' : null,
       },
       deadlinePolicy: db.prepare('SELECT * FROM deadline_policies WHERE active = 1').all(),
       database: path.basename(DB_PATH),
@@ -2634,6 +2640,16 @@ app.use('/api', (_req, res) => {
 });
 
 app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
+  // body-parser errors carry the submitted body. Never log that object or echo complaint content.
+  const parserError = err as { type?: string } | null;
+  if (parserError?.type === 'entity.parse.failed') {
+    res.status(400).json({ error: 'invalid_json', message: 'Send a valid JSON request body.' });
+    return;
+  }
+  if (parserError?.type === 'entity.too.large') {
+    res.status(413).json({ error: 'request_too_large', message: 'The request body exceeds the size limit.' });
+    return;
+  }
   if (err instanceof AppError) {
     res.status(err.status).json({ error: err.code, message: err.message, fields: err.fields });
     return;
@@ -2647,8 +2663,8 @@ app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
     res.status(409).json({ error: 'conflict', message: 'That record already exists (unique constraint).' });
     return;
   }
-  console.error('[caselink] unhandled', err);
-  res.status(500).json({ error: 'server_error', message: 'The server could not complete that request. Nothing was saved.' });
+  console.error('[caselink] unhandled request error', { name: (err as Error)?.name ?? 'Error', code: (err as { code?: string })?.code ?? 'unknown' });
+  res.status(500).json({ error: 'server_error', message: 'The server could not complete that request. Refresh the record before retrying.' });
 });
 
 /**
@@ -2717,7 +2733,7 @@ function reconcileUploads(): { completed: number; rolledBack: number; orphanFile
 
 /* --------------------------------------------------------------------- boot */
 
-const seeded = ensureSeed();
+const seeded = DEMO_MODE ? ensureSeed() : false;
 purgeExpiredSessions();
 const reconciled = reconcileUploads();
 if (reconciled.completed || reconciled.rolledBack || reconciled.orphanFiles) {

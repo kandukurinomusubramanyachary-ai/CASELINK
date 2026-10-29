@@ -620,7 +620,7 @@ async function main() {
   }
   await import('node:fs').then((fs) =>
     fs.writeFileSync(
-      'test/acceptance-results.json',
+      process.env.CASELINK_ACCEPTANCE_RESULTS ?? 'test/acceptance-results.json',
       JSON.stringify({ base: BASE, at: new Date().toISOString(), pass, total: results.length, results }, null, 2)
     )
   );

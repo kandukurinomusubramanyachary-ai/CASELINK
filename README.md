@@ -15,7 +15,8 @@ a human-confirmed case link.
 
 ```bash
 cd caselink
-bash start.sh               # installs deps / builds / seeds only if missing, then serves on port 8080
+# Use Node 22 (also recorded in .nvmrc).
+CASELINK_DEMO=true bash start.sh   # synthetic SIH demonstration on port 8080
 ```
 
 `bash start.sh` is idempotent and is the recommended way to start the app (run it with `bash` so a lost
@@ -23,16 +24,21 @@ executable bit after a snapshot restore cannot block startup): this sandbox drop
 packages, build output and running processes between sessions, so the script re-checks each of them
 before serving. `npm start` (build + serve) also works when `node_modules` is already present.
 
-Then open **http://localhost:8080**. **The default configuration requires sign-in**, exactly as the PRD's
+Then open **http://localhost:8080**. **Normal startup creates no accounts or complaint fixtures.**
+To prepare a separate sign-in-only synthetic test instance, explicitly run
+`CASELINK_DATA_DIR=/tmp/caselink-synthetic npm run seed` and start with the same data directory.
+The `seed` command resets its target database; use a disposable synthetic directory only.
+
+**The default configuration requires sign-in**, exactly as the PRD's
 authenticated-officer workflow does: there is no auto-entry, no account switcher, no published demo password
-and no `?as=` identity switching. Sign in on `#/login` with any account from the table below
+and no `?as=` identity switching. In an explicitly seeded synthetic instance, sign in on `#/login` with an account from the table below
 (password for every synthetic account: `caselink-demo`).
 
 ### Demo (fixture) mode is opt-in
 
 ```bash
 CASELINK_DEMO=true bash start.sh     # fixture entry: auto sign-in, header account switcher, ?as= deep links, password hints
-bash start.sh                        # default: authenticated sign-in only (CASELINK_DEMO=false)
+bash start.sh                        # default: authenticated sign-in only; no automatic seed
 ```
 
 In demo mode the app drops you straight into **My work** as the bureau lead (`m.nair`), the header shows a
@@ -41,11 +47,40 @@ issues a session without a password. In every other configuration that endpoint 
 interface behaves like a normal deployment. Demo mode changes *how you sign in*, never *what you may do*:
 the permission rules below apply in both modes (regression 10f in `test/security-m1.mjs`).
 
+### First administrator without fixture accounts
+
+On an empty account directory, set `CASELINK_DATA_DIR`, `CASELINK_ADMIN_USERNAME` and a unique
+`CASELINK_ADMIN_PASSWORD` of 16–256 characters in the remote process environment, then run
+`npm run bootstrap:admin`. Optional `CASELINK_ADMIN_NAME` controls the display name. The command
+refuses an existing account directory, prints no password and adds no demo complaints, institutions
+or deadline policies. Existing demo databases and their published passwords are preserved; use a
+separate data directory when moving beyond synthetic demonstrations.
+
+`npm run setup` installs/builds and exits without starting a server or seeding any database. Sign-in
+rejects oversized credentials and limits failed attempts per account and connection address. Browser
+writes must come from the same public host; reverse proxies must preserve the public `Host` header.
+Cookies use `HttpOnly; Secure; SameSite=Lax`; the existing Bearer fallback handles blocked cookies.
+
+### Submission verification
+
+```bash
+npm ci
+npx playwright install --with-deps chromium
+npm run verify
+```
+
+This runs typechecking, build, submission regressions, permissions, regional/privacy boundaries,
+lifecycle, concurrency, CSV import, migrations, matching evaluation, acceptance and browser sign-in,
+smoke and demo flows. Each API suite uses an isolated, explicitly seeded synthetic database. Logs and
+generated screenshots stay under `.runtime/verification-*`; failed or skipped required checks fail
+the gate. GitHub Actions runs the same gate for pull requests. This is prototype verification, not
+authorization to use real complaint data; see `docs/SUBMISSION-HARDENING.md` for residual risks.
+
 Other scripts:
 
 | Command | What it does |
 | --- | --- |
-| `bash start.sh` | self-healing start: install if missing, build if stale, seed if missing, then serve on `PORT` (default 8080) |
+| `bash start.sh` | install if missing, build if stale, then serve; fixture seeding requires `CASELINK_DEMO=true` |
 | `npm start` | build the React interface, then serve API + UI on `PORT` (default 8080) |
 | `npm run serve` | serve the API + already-built UI without rebuilding |
 | `npm run seed` | reseed the demo database (`data/caselink.db`) with the synthetic fixtures |
@@ -53,15 +88,16 @@ Other scripts:
 | `npm run test:acceptance` | run the T01–T12 acceptance suite plus supplementary security checks over HTTP |
 | `npm run test:login` | Playwright sign-in checks: normal, cookie-blocked, reload, sign-out, wrong password, and (normal config) that no demo shortcut or session exists |
 | `npm run test:m1` | **full Milestone 1 run**: starts an isolated sign-in-only instance *and* an isolated demo instance from fresh seeds, then runs the security regressions, the demo checks, acceptance, sign-in, direct-entry and the interface smoke run |
-| `npm run test:security` | M1 access-control regressions (66 checks) — requires an instance with `CASELINK_DEMO=false` |
+| `npm run test:security` | M1 access-control regressions (65 checks) — requires an instance with `CASELINK_DEMO=false` |
 | `npm run test:regional` | M1.1 regional-authorisation regressions (59 checks: alert acknowledgement + transfer decisions) — requires `CASELINK_DEMO=false` and the seeded West cohort |
 | `npm run test:demo` | demo-mode checks (8 checks) — requires an instance with `CASELINK_DEMO=true` |
 | `npm run test:direct` | Playwright direct-entry checks: no sign-in step, account switcher, `?as=` deep link, `#/login` (demo instance only) |
 | `npm run test:ui` | Playwright smoke run (app must be running) + screenshots into `docs/screenshots/` |
 | `npm run bench` | reference-scale benchmark: 10,000 synthetic cases, 100 institutions, isolated database |
 
-Data lives in `data/caselink.db` (SQLite) and private uploads in `data/uploads/`. Delete the database file
-and restart to get a fresh seeded demo.
+Data lives in `data/caselink.db` (SQLite) and private uploads in `data/uploads/`. For a fresh demo, use a
+new disposable `CASELINK_DATA_DIR` and explicitly run `npm run seed` there. Never delete or reseed an
+operational database to reset a demonstration.
 
 ### Demo accounts
 
@@ -236,6 +272,10 @@ infrastructure.
 
 ## 7. Documentation
 
+* [`docs/BASELINE.md`](docs/BASELINE.md) — Milestone 0 candidate status, environment, verification, migration and recovery
+* [`docs/FEATURE-INVENTORY.md`](docs/FEATURE-INVENTORY.md) — implemented features, evidence, limitations and improvement candidates
+* [`docs/NEXT-SPRINTS.md`](docs/NEXT-SPRINTS.md) — prioritized post-baseline feature roadmap
+* [`docs/SUBMISSION-HARDENING.md`](docs/SUBMISSION-HARDENING.md) — PR #1 hardening findings, evidence and operational limits
 * [`docs/API.md`](docs/API.md) — endpoints, authorisation rules, error contract
 * [`docs/TRACEABILITY.md`](docs/TRACEABILITY.md) — PRD requirement → implementation → test map, plus deviations and open decisions
 * [`docs/TEST-RESULTS.md`](docs/TEST-RESULTS.md) — acceptance, UI and benchmark results with conditions

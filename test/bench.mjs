@@ -26,7 +26,7 @@ import crypto from 'node:crypto';
 import Database from 'better-sqlite3';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
-const BENCH_DIR = path.join(ROOT, 'data', 'bench');
+const BENCH_DIR = process.env.CASELINK_BENCH_DIR ? path.resolve(process.env.CASELINK_BENCH_DIR) : path.join(ROOT, 'data', 'bench');
 const BENCH_DB = path.join(BENCH_DIR, 'caselink.db');
 const PORT = Number(process.env.BENCH_PORT ?? 8099);
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -42,7 +42,11 @@ const nowIso = () => new Date().toISOString();
 /* ------------------------------------------------------------------- seeding */
 if (RESEED) fs.rmSync(BENCH_DIR, { recursive: true, force: true });
 fs.mkdirSync(BENCH_DIR, { recursive: true });
-if (!fs.existsSync(BENCH_DB)) fs.copyFileSync(path.join(ROOT, 'data', 'caselink.db'), BENCH_DB);
+if (!fs.existsSync(BENCH_DB)) {
+  // The source may still have committed pages in its WAL; copying only the main file loses them.
+  const source = new Database(process.env.CASELINK_SOURCE_DB ?? path.join(ROOT, 'data', 'caselink.db'), { readonly: true });
+  try { await source.backup(BENCH_DB); } finally { source.close(); }
+}
 
 const db = new Database(BENCH_DB);
 const existing = db.prepare('SELECT COUNT(*) AS n FROM cases').get().n;
@@ -137,7 +141,7 @@ machine.sqlite = (() => {
 })();
 
 /* --------------------------------------------------------------------- server */
-const server = spawn('npx', ['tsx', 'server/src/index.ts'], {
+const server = spawn(process.execPath, ['--import', 'tsx', 'server/src/index.ts'], {
   cwd: ROOT,
   env: { ...process.env, PORT: String(PORT), CASELINK_DATA_DIR: BENCH_DIR, CASELINK_DEMO: 'true' },
   stdio: ['ignore', 'pipe', 'pipe'],
@@ -404,7 +408,7 @@ console.log(`concurrency ${sessions.length} (mixed traffic): ${concurrentFails.l
 console.log(`concurrency ${sessions.length} (list+read only): ${readOnlyFails.length === 0 ? 'every target met' : `missed — ${readOnlyFails.join('; ')}`}`);
 console.log(`overlap alert: ${alertLatency === null ? 'not observed' : alertLatency <= 5000 ? 'met' : 'missed'}`);
 
-const reportPath = path.join(ROOT, 'docs', 'm6-benchmark.json');
+const reportPath = process.env.CASELINK_BENCH_REPORT ? path.resolve(process.env.CASELINK_BENCH_REPORT) : path.join(ROOT, 'docs', 'm6-benchmark.json');
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 const phaseJson = (phase) =>
   rowsOf(phase).map((row) => ({ probe: row.label, n: row.values.length, p50: quantile(row.values, 0.5), p95: quantile(row.values, 0.95), errors: row.errors, targetP95: row.target }));

@@ -123,9 +123,8 @@ CREATE INDEX IF NOT EXISTS cases_status_idx ON cases(status);
 CREATE INDEX IF NOT EXISTS cases_assigned_idx ON cases(assigned_officer_id);
 CREATE INDEX IF NOT EXISTS cases_expected_disposal_idx ON cases(expected_disposal_at);
 CREATE INDEX IF NOT EXISTS cases_updated_idx ON cases(updated_at);
-CREATE UNIQUE INDEX IF NOT EXISTS cases_import_dedupe
-  ON cases(source_channel, bureau, source_reference)
-  WHERE source_reference IS NOT NULL AND source_channel = 'CSV import';
+-- Migration 8 installs cases_import_identity after legacy provenance columns have been added.
+-- Do not recreate the old (channel, bureau, reference) index on subsequent application boots.
 
 CREATE TABLE IF NOT EXISTS dispositions (
   id                  TEXT PRIMARY KEY,

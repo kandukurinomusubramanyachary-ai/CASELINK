@@ -84,19 +84,23 @@ export function enqueue(kind: string, payload: Record<string, unknown>, runAfter
 
 export function runJobs(): number {
   const jobs = db
-    .prepare(`SELECT * FROM jobs WHERE state = 'pending' AND run_after <= ? ORDER BY run_after LIMIT 200`)
-    .all(nowIso()) as { id: string; kind: string; payload_json: string; attempts: number }[];
+    .prepare(`SELECT * FROM jobs WHERE state = 'pending' AND run_after <= ?
+      AND (? = 'rule-based' OR kind <> 'recompute_suggestions') ORDER BY run_after LIMIT 200`)
+    .all(nowIso(), workerState.matchingMode) as { id: string; kind: string; payload_json: string; attempts: number }[];
+  let processed = 0;
   for (const job of jobs) {
     try {
-      const payload = JSON.parse(job.payload_json) as { institutionId?: string };
-      if (job.kind === 'recompute_overlap' && payload.institutionId) {
-        recomputeOverlap(payload.institutionId);
-      } else if (job.kind === 'recompute_suggestions' && payload.institutionId) {
-        if (workerState.matchingMode === 'rule-based') recomputeSuggestions(payload.institutionId);
-      } else if (job.kind === 'notify_overlap' && payload.institutionId) {
-        notifyOverlap(payload.institutionId);
-      }
-      db.prepare(`UPDATE jobs SET state = 'done', completed_at = ? WHERE id = ?`).run(nowIso(), job.id);
+      db.transaction(() => {
+        const payload = JSON.parse(job.payload_json) as { institutionId?: unknown } | null;
+        if (!payload || typeof payload.institutionId !== 'string' || !payload.institutionId) throw new Error('Invalid background-job payload');
+        if (job.kind === 'recompute_overlap') recomputeOverlap(payload.institutionId);
+        else if (job.kind === 'recompute_suggestions') recomputeSuggestions(payload.institutionId);
+        else if (job.kind === 'notify_overlap') notifyOverlap(payload.institutionId);
+        else throw new Error('Unknown background-job kind');
+        // Job effects and completion commit together; a partial recomputation is never reported done.
+        db.prepare(`UPDATE jobs SET state = 'done', completed_at = ?, last_error = NULL WHERE id = ?`).run(nowIso(), job.id);
+      })();
+      processed += 1;
     } catch (err) {
       const attempts = job.attempts + 1;
       db.prepare(
@@ -112,7 +116,24 @@ export function runJobs(): number {
       workerState.lastError = String((err as Error).message);
     }
   }
-  return jobs.length;
+  workerState.lastError = jobHealth().lastError;
+  return processed;
+}
+
+/** Durable queue health survives successful scans and process restarts. */
+export function jobHealth(): {
+  pendingJobs: number; retryingJobs: number; failedJobs: number; oldestPendingAt: string | null; lastError: string | null;
+} {
+  const counts = db.prepare(`SELECT
+    COUNT(CASE WHEN state='pending' THEN 1 END) AS pendingJobs,
+    COUNT(CASE WHEN state='pending' AND attempts>0 THEN 1 END) AS retryingJobs,
+    COUNT(CASE WHEN state='failed' THEN 1 END) AS failedJobs,
+    MIN(CASE WHEN state='pending' THEN created_at END) AS oldestPendingAt FROM jobs`).get() as {
+      pendingJobs: number; retryingJobs: number; failedJobs: number; oldestPendingAt: string | null;
+    };
+  const failure = db.prepare(`SELECT last_error FROM jobs WHERE state IN ('pending','failed') AND last_error IS NOT NULL
+    ORDER BY created_at DESC LIMIT 1`).get() as { last_error: string } | undefined;
+  return { ...counts, lastError: failure?.last_error ?? null };
 }
 
 function notifyOverlap(institutionId: string): void {
@@ -266,7 +287,7 @@ export function runWorkerTick(): { processed: number; notifications: number } {
   workerState.lastRunAt = nowIso();
   workerState.lastRunProcessed = processed;
   workerState.runs += 1;
-  workerState.lastError = null;
+  workerState.lastError = jobHealth().lastError;
   db.prepare(
     `INSERT INTO settings (key, value) VALUES ('worker_last_run', ?)
      ON CONFLICT(key) DO UPDATE SET value = excluded.value`
