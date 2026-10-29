@@ -114,6 +114,16 @@ await check('M4 rejects missing reason, missing versions and missing idempotency
     {...body(d,'Same'),caseAVersion:undefined},'m4-badversion')).status,422);
   assert.equal((await call('POST','/m4/decisions/'+same.id+'/confirm',supervisor,body(d,'Same'))).status,422);
 });
+await check('M4 refuses stale complaint versions before changing a relationship',async()=>{
+  const d=(await get(same)).data;
+  const rejected=await call('POST','/m4/decisions/'+same.id+'/confirm',supervisor,{
+    ...body(d,'Same'),caseAVersion:d.caseA.version-1,
+  },'m4-stale-case-'+stamp);
+  assert.equal(rejected.status,409);
+  const db=openDb();
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM m4_decisions WHERE handoff_id=?').get(same.id).n,0);
+  db.close();
+});
 let sameDecision;
 await check('SAME confirms canonical pair while preserving both complaint originals',async()=>{
   const d=(await get(same)).data;
@@ -303,6 +313,58 @@ await check('transaction failure rolls back relationships, cases, suggestions an
   const confirmed=await call('POST','/m4/decisions/'+related.id+'/confirm',supervisor,
     body(after,'Related'),'m4-related-'+stamp);
   assert.equal(confirmed.status,200,JSON.stringify(confirmed.data));
+});
+await check('concurrent competing confirmations permit only one active decision',async()=>{
+  const racing=await makeFixture('M4-RACE',
+    'Library entrance stairs are blocked by collapsed debris after repairs and need immediate clearance.',
+    'Collapsed debris blocks student access on the library stairs and the repairs are delayed.');
+  await accept(racing);
+  const d=(await get(racing)).data;
+  const [first,second]=await Promise.all([
+    call('POST','/m4/decisions/'+racing.id+'/confirm',supervisor,
+      body(d,'Related'),'m4-race-first-'+stamp),
+    call('POST','/m4/decisions/'+racing.id+'/confirm',supervisor,
+      body(d,'Same'),'m4-race-second-'+stamp),
+  ]);
+  assert.deepEqual([first.status,second.status].sort((a,b)=>a-b),[200,409],
+    JSON.stringify([first.data,second.data]));
+  const db=openDb();
+  try{
+    const pair=[racing.cases[0].id,racing.cases[1].id].sort().join('::');
+    assert.equal(db.prepare("SELECT COUNT(*) AS n FROM m4_decisions WHERE pair_key=? AND state='confirmed'").get(pair).n,1);
+  }finally{db.close();}
+});
+await check('revoked content grant blocks reads, reversals and idempotent replay',async()=>{
+  const current=await call('GET','/cases/'+same.cases[0].id,lead);
+  assert.equal(current.status,200);
+  const remove=await call('POST','/cases/'+same.cases[0].id+'/grants',lead,{
+    version:current.data.case.version,userId:'u-supervisor',
+    note:'Temporarily revoke access for M4 security regression.',revoke:true,
+  });
+  assert.equal(remove.status,200,JSON.stringify(remove.data));
+  try{
+    assert.equal((await get(same)).status,404);
+    const d=remove.data.case;
+    const attempt=await call('POST','/m4/decisions/'+same.id+'/reverse',supervisor,{
+      decisionId:sameDecision.decisionId,decisionVersion:1,
+      reason:'Reversal with revoked supervisor grant should never succeed.',
+      caseAVersion:d.version,caseBVersion:0,
+    },'m4-revoked-'+stamp);
+    assert.equal(attempt.status,404);
+    const retry=await call('POST','/m4/decisions/'+same.id+'/confirm',supervisor,{
+      decision:'Same',reasonCategory:'Same incident',
+      reason:'Two reports share the same documented context requiring a supervisor decision.',
+      caseAVersion:d.version,caseBVersion:0,reviewVersion:1,
+    },'m4-same-'+stamp);
+    assert.equal(retry.status,404,'Replay must reauthorize before returning a stored response');
+  }finally{
+    const fresh=await call('GET','/cases/'+same.cases[0].id,lead);
+    const restore=await call('POST','/cases/'+same.cases[0].id+'/grants',lead,{
+      version:fresh.data.case.version,userId:'u-supervisor',
+      note:'Restore synthetic supervisor access after security regression.',
+    });
+    assert.equal(restore.status,200,JSON.stringify(restore.data));
+  }
 });
 console.log('M4 relationship API:',tests.filter(x=>x[1]).length+'/'+tests.length);
 if(failures)process.exitCode=1;
