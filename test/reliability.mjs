@@ -7,6 +7,7 @@ import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { createServer } from 'node:net';
 import Database from 'better-sqlite3';
+import { countRequiredSkips } from './required-checks.mjs';
 
 const repo = path.resolve(import.meta.dirname, '..');
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'caselink-reliability-'));
@@ -58,6 +59,25 @@ async function server(t, data, demo = false) {
   };
   return { base, api, login, stop, logs: () => output };
 }
+
+test('release gate rejects explicit, disguised, TAP and summary-only skipped checks', () => {
+  const skippedOutputs = [
+    'SKIP  T01 — fixture unavailable',
+    'ok 1 - relationship review # SKIP fixture unavailable',
+    'PASS  reviewer acknowledgement — no notification fixture — skipped',
+    '# tests 2\n# pass 1\n# skipped 1',
+    'executed: 2   passed: 1   failed: 0   skipped: 1',
+    '1 skipped (not counted as passes):',
+  ];
+  for (const output of skippedOutputs) assert.ok(countRequiredSkips(output) > 0, output);
+  const legitimateOutputs = [
+    'PASS import commit — accepted=1 rejected=0 skipped=2',
+    'PASS import response — {"accepted":1,"skipped":2}',
+    '# tests 1\n# pass 1\n# skipped 0',
+    'executed: 1   passed: 1   failed: 0   skipped: 0',
+  ];
+  for (const output of legitimateOutputs) assert.equal(countRequiredSkips(output), 0, output);
+});
 
 test('normal boot creates no fixture accounts and bootstrap uses unique credentials', async t => {
   const data = dir('empty');

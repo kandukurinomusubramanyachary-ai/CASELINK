@@ -88,15 +88,16 @@ Other scripts:
 | `npm run test:acceptance` | run the T01–T12 acceptance suite plus supplementary security checks over HTTP |
 | `npm run test:login` | Playwright sign-in checks: normal, cookie-blocked, reload, sign-out, wrong password, and (normal config) that no demo shortcut or session exists |
 | `npm run test:m1` | **full Milestone 1 run**: starts an isolated sign-in-only instance *and* an isolated demo instance from fresh seeds, then runs the security regressions, the demo checks, acceptance, sign-in, direct-entry and the interface smoke run |
-| `npm run test:security` | M1 access-control regressions (66 checks) — requires an instance with `CASELINK_DEMO=false` |
+| `npm run test:security` | M1 access-control regressions (65 checks) — requires an instance with `CASELINK_DEMO=false` |
 | `npm run test:regional` | M1.1 regional-authorisation regressions (59 checks: alert acknowledgement + transfer decisions) — requires `CASELINK_DEMO=false` and the seeded West cohort |
 | `npm run test:demo` | demo-mode checks (8 checks) — requires an instance with `CASELINK_DEMO=true` |
 | `npm run test:direct` | Playwright direct-entry checks: no sign-in step, account switcher, `?as=` deep link, `#/login` (demo instance only) |
 | `npm run test:ui` | Playwright smoke run (app must be running) + screenshots into `docs/screenshots/` |
 | `npm run bench` | reference-scale benchmark: 10,000 synthetic cases, 100 institutions, isolated database |
 
-Data lives in `data/caselink.db` (SQLite) and private uploads in `data/uploads/`. Delete the database file
-and restart to get a fresh seeded demo.
+Data lives in `data/caselink.db` (SQLite) and private uploads in `data/uploads/`. For a fresh demo, use a
+new disposable `CASELINK_DATA_DIR` and explicitly run `npm run seed` there. Never delete or reseed an
+operational database to reset a demonstration.
 
 ### Demo accounts
 
@@ -271,6 +272,10 @@ infrastructure.
 
 ## 7. Documentation
 
+* [`docs/BASELINE.md`](docs/BASELINE.md) — Milestone 0 candidate status, environment, verification, migration and recovery
+* [`docs/FEATURE-INVENTORY.md`](docs/FEATURE-INVENTORY.md) — implemented features, evidence, limitations and improvement candidates
+* [`docs/NEXT-SPRINTS.md`](docs/NEXT-SPRINTS.md) — prioritized post-baseline feature roadmap
+* [`docs/SUBMISSION-HARDENING.md`](docs/SUBMISSION-HARDENING.md) — PR #1 hardening findings, evidence and operational limits
 * [`docs/API.md`](docs/API.md) — endpoints, authorisation rules, error contract
 * [`docs/TRACEABILITY.md`](docs/TRACEABILITY.md) — PRD requirement → implementation → test map, plus deviations and open decisions
 * [`docs/TEST-RESULTS.md`](docs/TEST-RESULTS.md) — acceptance, UI and benchmark results with conditions
