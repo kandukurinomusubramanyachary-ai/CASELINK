@@ -51,3 +51,5 @@
 .m3-preview-content{flex:1;min-height:0;width:100%;border:1px solid var(--line);background:white}
 @media(max-width:1200px){.m3-columns{grid-template-columns:repeat(2,minmax(0,1fr))}.m3-comparison{grid-column:1/-1;grid-row:2}}
 @media(max-width:680px){.m3-columns{grid-template-columns:minmax(0,1fr)}.m3-comparison{grid-column:auto;grid-row:auto}.m3-case{padding:15px}.m3-fields{grid-template-columns:95px 1fr}.m3-review-form{min-width:0}.m3-permission{width:100%}}
+
+.m3-success{padding:13px 16px;margin:12px 0;border-radius:10px;background:#e8f6ef;color:#1c6540;font-size:12px;font-weight:650}

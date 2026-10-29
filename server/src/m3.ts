@@ -117,6 +117,37 @@ function detail(user: SessionUser, id: string) {
   };
 }
 
+/**
+ * A request for evidence is delivered to active owning bureau leads through
+ * CaseLink's existing protected notification inbox. Each notice refers to
+ * only one authorized case; never copy the pair or supervisor's cross-case note.
+ */
+function notifyEvidenceRequest(handoffId: string, cases: CaseRecord[], version: number, at: string): number {
+  let sent=0;
+  for (const c of cases) {
+    const leads=db.prepare(
+      "SELECT id FROM users WHERE role='bureau_lead' AND active=1 AND bureau=? "+
+      "AND (region IS NULL OR region=?)"
+    ).all(c.bureau,c.institution_region) as Array<{id:string}>;
+    for (const recipient of leads) {
+      const result=db.prepare(
+        'INSERT OR IGNORE INTO notifications '+
+        '(id,user_id,kind,entity_type,entity_id,dedupe_key,title,body,detail_json,created_at) '+
+        'VALUES (?,?,?,?,?,?,?,?,?,?)'
+      ).run(
+        uid(),recipient.id,'Supervisor evidence request','case',c.id,
+        'm3-evidence:'+handoffId+':'+version+':'+c.id+':'+recipient.id,
+        'Additional evidence requested for '+c.case_number,
+        'A supervisor requested additional supporting evidence for this case. Review the record and upload any new supporting documents in its existing case workspace.',
+        JSON.stringify({caseNumber:c.case_number,category:c.category,bureau:c.bureau}),
+        at
+      );
+      sent+=result.changes;
+    }
+  }
+  return sent;
+}
+
 export function registerM3Routes(app: Express): void {
   app.get('/api/m3/reviews', requireAuth, handle((req, res) => {
     const user = supervisor(req);
@@ -156,7 +187,7 @@ export function registerM3Routes(app: Express): void {
     const { action, reason, expectedVersion } = parsed.data;
     const outcome = tx(() => {
       // Recheck inside the transaction, including current case grants.
-      const { handoff: latest } = loadHandoff(user, h.id);
+      const { handoff: latest, a, b } = loadHandoff(user, h.id);
       if (latest.suggestion_state !== 'open' && action === 'accept')
         throw new AppError(409, 'candidate_changed', 'Candidate is no longer open.');
       const prior = currentReview(h.id);
@@ -185,8 +216,11 @@ export function registerM3Routes(app: Express): void {
         (id,handoff_id,actor_id,action,reason,from_state,to_state,at,version_after)
         VALUES (?,?,?,?,?,?,?,?,?)`)
         .run(uid(),h.id,user.id,action,reason,state,to,at,version+1);
-      audit(user.id, 'm3_review_' + action, 'handoff=' + h.id + ' version=' + (version+1));
-      return { state: to, version: version + 1, updatedAt: at };
+      const notificationsSent=action==='request_evidence' ?
+        notifyEvidenceRequest(h.id,[a,b],version+1,at) : 0;
+      audit(user.id, 'm3_review_' + action,
+        'handoff=' + h.id + ' version=' + (version+1) + ' notifications=' + notificationsSent);
+      return { state: to, version: version + 1, updatedAt: at, notificationsSent };
     });
     res.json({ ...outcome, detail: detail(user, h.id) });
   }));

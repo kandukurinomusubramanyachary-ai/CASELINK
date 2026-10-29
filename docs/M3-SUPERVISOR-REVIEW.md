@@ -31,6 +31,9 @@ M3 **does not** create a Same/Related/Separate decision; M4 must enforce the acc
 - `m3_reviews`: per-handoff review state and optimistic integer version.
 - `m3_review_events`: append-only supervisor actions with actor, before/after state,
   reason, timestamp and version. These records are not generated from UI fixtures.
+- Evidence requests also deliver in-app, **case-specific** notifications to active owning bureau leads.
+  Notifications never disclose the second complaint or the supervisor's cross-case review note;
+  the recipient can upload new evidence through the existing case workspace.
 - M2's original handoff row remains unchanged.
 - The M3 review ledger does not overwrite `action_events` or `relationships`.
 
@@ -45,7 +48,8 @@ M3 **does not** create a Same/Related/Separate decision; M4 must enforce the acc
 4. Use M2 Overlap Detection to send the South-region candidate to `a.desai`.
    Then sign in as `a.desai`, open `#/supervisor-review` and select the assigned pair.
 5. Inspect evidence and both timelines. Use Request More Evidence with a detailed reason.
-   Verify `awaiting_evidence` and a persisted audit entry. Resume and accept for decision.
+   Verify `awaiting_evidence`, the persisted audit entry, and owning bureau lead inbox notices.
+   Resume and accept for decision.
 6. Sign in as officer `p.rao` and West supervisor `v.kumar`; direct M3 routes
    must deny access or hide the pair. Revoking case grants or regional scope must also deny access.
 

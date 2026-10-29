@@ -175,6 +175,16 @@ await check('request for evidence and resume are persisted',async()=>{
   assert.equal(a.status,200);
   version=a.data.version;
   assert.equal(a.data.state,'awaiting_evidence');
+  assert.ok(a.data.notificationsSent>=1,'At least one owning lead must be notified');
+  const inbox=await request('GET','/notifications',lead);
+  assert.equal(inbox.status,200);
+  const alerts=inbox.data.notifications.filter(x=>x.kind==='Supervisor evidence request' &&
+    [cases[0].id,cases[1].id].includes(x.entityId));
+  assert.ok(alerts.length>=1,'Owning leads must receive actionable case notifications');
+  for(const alert of alerts){
+    assert.ok(!alert.body.includes('m3-evidence:'),'Notification body must not reveal pair keys');
+    assert.ok(!alert.body.includes(pair.id),'Notification must not reveal M2 pair information');
+  }
   const b=await action('resume','Requested notice received in the independent case evidence section.');
   assert.equal(b.status,200);
   version=b.data.version;
