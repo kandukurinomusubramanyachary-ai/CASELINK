@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 /** M4 isolated API/security/database assertions — all complaints and users are synthetic. */
 import assert from 'node:assert/strict';
 import Database from 'better-sqlite3';
@@ -162,6 +163,36 @@ await check('unique active pair prevents a second confirmed decision',async()=>{
   const d=(await get(same)).data;
   assert.equal((await call('POST','/m4/decisions/'+same.id+'/confirm',supervisor,body(d,'Related'),
     'm4-second-'+stamp)).status,409);
+});
+await check('reversed case ordering yields identical canonical pair and cannot double-confirm',async()=>{
+  // Insert an isolated synthetic suggestion with A and B intentionally reversed.
+  // The normal worker only produces canonical ordering; this exercises adversarial input.
+  const reversedSuggestionId=crypto.randomUUID(),reversedHandoffId=crypto.randomUUID();
+  const db=openDb(false);
+  try{
+    const row=db.prepare(
+      "INSERT INTO suggestions(id,institution_id,case_a_id,case_b_id,kind,reasons_json,evidence_hash,rule_version,state,dedupe_key,created_at,decided_by,decided_at,decision_reason) "+
+      "SELECT ?,institution_id,case_b_id,case_a_id,kind,reasons_json,evidence_hash,rule_version,'open',?, ?,NULL,NULL,NULL "+
+      "FROM suggestions WHERE id=?"
+    ).run(reversedSuggestionId,'reverse-pair-'+stamp,new Date().toISOString(),same.pair.id);
+    assert.equal(row.changes,1);
+    db.prepare(
+      'INSERT INTO m2_review_handoffs(id,suggestion_id,sent_by,supervisor_id,reason,sent_at) VALUES (?,?,?,?,?,?)'
+    ).run(reversedHandoffId,reversedSuggestionId,'u-lead-pgrc','u-supervisor',
+      'Supervisor review of intentionally reversed case ordering for synthetic regression.',new Date().toISOString());
+  }finally{db.close();}
+  const accepted=await call('POST','/m3/reviews/'+reversedHandoffId+'/actions',supervisor,{
+    action:'accept',reason:'Both cases have been inspected; test canonical pair safety.',expectedVersion:0,
+  });
+  assert.equal(accepted.status,200,JSON.stringify(accepted.data));
+  const d=(await call('GET','/m4/decisions/'+reversedHandoffId,supervisor)).data;
+  assert.ok(d.activeDecision);
+  assert.equal(d.activeDecision.id,sameDecision.decisionId);
+  assert.equal(d.pairKey,[same.cases[0].id,same.cases[1].id].sort().join('::'));
+  const denied=await call('POST','/m4/decisions/'+reversedHandoffId+'/confirm',supervisor,
+    body(d,'Related','This reversed ordering must not allow a duplicate live relationship.'),
+    'm4-reordered-'+stamp);
+  assert.equal(denied.status,409);
 });
 await check('M4 rejects stale versions and cross-region reversals',async()=>{
   const d=(await get(same)).data;
