@@ -1,0 +1,27 @@
+name: M3 isolated verification
+on:
+  push:
+    branches: [feat/m3-supervisor-review-secure]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-m3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npx playwright install --with-deps chromium
+      - run: npm run verify
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m3-verification
+          include-hidden-files: true
+          path: .runtime/verification-*/
