@@ -5,7 +5,7 @@
 import type { Express, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { db, uid, nowIso, audit, tx } from './db.js';
-import { requireAuth, recordSecurityDenial, type SessionUser } from './auth.js';
+import { requireAuth, recordSecurityDenial, sessionUserById, type SessionUser } from './auth.js';
 import { canViewMetadata, canViewContent, getCase, type CaseRecord } from './domain.js';
 import { projectSuggestion, withCaseCache, type SuggestionRow } from './privacy.js';
 import { workerState } from './worker.js';
@@ -93,14 +93,11 @@ function supervisors(a: CaseRecord, b: CaseRecord, user: SessionUser) {
   const rows = db.prepare("SELECT id, display_name AS displayName FROM users WHERE role = 'supervisor' AND active = 1 ORDER BY display_name")
     .all() as { id: string; displayName: string }[];
   return rows.filter((r) => {
-    const candidate = db.prepare('SELECT id FROM users WHERE id = ?').get(r.id);
-    if (!candidate || r.id === user.id) return false;
-    // Region and bureau policies are enforced via the same session-user authority loader.
-    const supervisor = db.prepare('SELECT id, username, display_name, role, bureau, region, active FROM users WHERE id = ?')
-      .get(r.id) as Record<string, unknown> | undefined;
-    if (!supervisor) return false;
-    return canViewMetadata(supervisor as unknown as SessionUser, a) &&
-      canViewMetadata(supervisor as unknown as SessionUser, b);
+    if (r.id === user.id) return false;
+    // Build a complete session principal, including current grants; a partial DB row would bypass
+    // the source-of-truth policy shape and can throw on grantedCaseIds.
+    const supervisor = sessionUserById(r.id);
+    return Boolean(supervisor && canViewMetadata(supervisor, a) && canViewMetadata(supervisor, b));
   });
 }
 export function registerM2Routes(app: Express) {
