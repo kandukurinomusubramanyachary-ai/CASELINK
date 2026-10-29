@@ -104,6 +104,19 @@ await check('pair details, preserved independent histories and real factors',asy
   assert.ok(Array.isArray(details.caseA.history)&&Array.isArray(details.caseB.history));
   assert.equal(details.review.state,'pending');
 });
+await check('contradictory matching factors are preserved, not converted to confidence',async()=>{
+  const database=new Database(DB);
+  try {
+    const source=database.prepare('SELECT reasons_json FROM suggestions WHERE id=?').get(pair.id);
+    const reasons=JSON.parse(source.reasons_json);
+    reasons.push({rule:'different_category',detail:'Conflicting classifications require manual inspection.',sourceField:'category'});
+    database.prepare('UPDATE suggestions SET reasons_json=? WHERE id=?').run(JSON.stringify(reasons),pair.id);
+  }finally{database.close();}
+  const r=await request('GET','/m3/reviews/'+id,supervisor);
+  assert.equal(r.status,200);
+  assert.ok(r.data.comparison.reasons.some(x=>x.rule==='different_category'));
+  assert.ok(!JSON.stringify(r.data.comparison).includes('87%'));
+});
 await check('empty evidence is represented explicitly without invented previews',async()=>{
   assert.ok(Array.isArray(details.caseA.attachments));
   const missing=await request('GET','/m3/reviews/'+id+'/evidence/00000000-0000-0000-0000-000000000000',supervisor);
@@ -192,6 +205,9 @@ await check('access revocation prevents new reads, writes, and evidence retrieva
   try{
     assert.equal((await request('GET','/m3/reviews/'+id,supervisor)).status,404);
     assert.equal((await action('needs_review','Attempt with rescinded regional authority')).status,404);
+    const latest=await request('GET','/m3/reviews/'+id+'/evidence/'+
+      (await request('GET','/cases/'+cases[0].id,lead)).data.attachments[0].id,supervisor);
+    assert.equal(latest.status,404);
     const queue=await request('GET','/m3/reviews',supervisor);
     assert.equal(queue.status,200);
     assert.ok(!queue.data.reviews.some(r=>r.id===id));
