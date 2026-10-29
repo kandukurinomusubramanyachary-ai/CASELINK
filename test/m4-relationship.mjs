@@ -67,7 +67,7 @@ async function accept(f){
 }
 function body(d,decision,reason='Two reports share the same documented context requiring a supervisor decision.'){
   return {decision,reasonCategory:'Same incident',reason,caseAVersion:d.caseA.version,
-    caseBVersion:d.caseB.version,reviewVersion:d.review.version};
+    caseBVersion:d.caseB.version,reviewVersion:d.review?.version??0};
 }
 const same=await makeFixture('M4-SAME',
  'North hostel water pipeline ruptured near block B and left rooms without drinking water for two days.',
