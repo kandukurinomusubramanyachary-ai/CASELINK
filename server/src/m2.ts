@@ -170,7 +170,7 @@ export function registerM2Routes(app: Express) {
   app.post('/api/m2/suggestions/:id/handoff', requireAuth, handle((req, res) => {
     const user = req.user as SessionUser;
     const body = z.object({
-      supervisorId: z.string().uuid(),
+      supervisorId: z.string().min(1).max(128),
       reason: z.string().trim().min(10).max(800),
       caseAVersion: z.number().int().positive(),
       caseBVersion: z.number().int().positive(),
