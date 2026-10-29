@@ -366,6 +366,14 @@ export function projectNotification(user: SessionUser, n: NotificationRow) {
       const c = cachedCase(caseId);
       return Boolean(c && canViewMetadata(user, c));
     }
+    if (entityType === 'suggestion') {
+      const pair = db.prepare('SELECT case_a_id, case_b_id FROM suggestions WHERE id = ?')
+        .get(entityId) as { case_a_id: string; case_b_id: string } | undefined;
+      if (!pair) return false;
+      const a = cachedCase(pair.case_a_id);
+      const b = cachedCase(pair.case_b_id);
+      return Boolean(a && b && canViewMetadata(user, a) && canViewMetadata(user, b));
+    }
     if (entityType === 'alert') {
       const alert = db.prepare('SELECT case_ids_json, institution_id FROM alerts WHERE id = ?').get(entityId) as
         | { case_ids_json: string; institution_id: string | null }
@@ -385,6 +393,7 @@ export function projectNotification(user: SessionUser, n: NotificationRow) {
     return {
       ...base,
       redacted: true,
+      entityId: 'restricted',
       title: 'Notice no longer available in your scope',
       body: `${NOT_IN_SCOPE} The related record is outside your current bureau, region or grants.`,
     };

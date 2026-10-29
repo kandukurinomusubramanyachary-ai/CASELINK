@@ -219,6 +219,17 @@ CREATE TABLE IF NOT EXISTS suggestions (
   decision_reason TEXT
 );
 
+CREATE TABLE IF NOT EXISTS m2_review_handoffs (
+  id            TEXT PRIMARY KEY,
+  suggestion_id TEXT NOT NULL REFERENCES suggestions(id),
+  sent_by       TEXT NOT NULL REFERENCES users(id),
+  supervisor_id TEXT NOT NULL REFERENCES users(id),
+  reason        TEXT NOT NULL,
+  sent_at       TEXT NOT NULL,
+  UNIQUE (suggestion_id, supervisor_id)
+);
+CREATE INDEX IF NOT EXISTS m2_handoffs_supervisor_idx ON m2_review_handoffs(supervisor_id, sent_at);
+
 CREATE TABLE IF NOT EXISTS alerts (
   id              TEXT PRIMARY KEY,
   kind            TEXT NOT NULL CHECK (kind IN ('Institution overlap','Deadline','Escalation')),

@@ -8,7 +8,7 @@ import { fmtDateTime, relativeDays } from '../util';
 export default function AlertsScreen() {
   const { notifications, refreshNotifications, refreshSession } = useApp();
   const { push } = useToast();
-  const [tab, setTab] = useState<'all' | 'overlap' | 'deadline' | 'overdue' | 'transfer' | 'escalation'>('all');
+  const [tab, setTab] = useState<'all' | 'overlap' | 'deadline' | 'overdue' | 'transfer' | 'escalation' | 'm2_handoff'>('all');
   const [status, setStatus] = useState<any>(null);
   const [error, setError] = useState<ApiError | null>(null);
   const [busy, setBusy] = useState(false);
@@ -87,7 +87,7 @@ export default function AlertsScreen() {
         <Stat label="Unread" value={notifications.filter((n) => !n.readAt).length} tone="blue" hint="Click to open the record" />
         <Stat label="Overdue reminders" value={byKind('overdue')} tone="red" hint="Disposed cases stop receiving these" />
         <Stat label="Deadline approaching" value={byKind('deadline')} tone="amber" hint="Within 7 days of the configured due time" />
-        <Stat label="Overlap / escalation" value={byKind('overlap') + byKind('escalation')} tone="violet" hint="Coordination and supervisor signal" />
+        <Stat label="Overlap / escalation" value={byKind('overlap') + byKind('escalation') + byKind('m2_handoff')} tone="violet" hint="Coordination and supervisor signal" />
       </div>
 
       {status && (
@@ -106,6 +106,7 @@ export default function AlertsScreen() {
           tabs={[
             { id: 'all', label: 'All', count: notifications.length },
             { id: 'overlap', label: 'Overlap', count: byKind('overlap') },
+            { id: 'm2_handoff', label: 'Review requests', count: byKind('m2_handoff') },
             { id: 'deadline', label: 'Deadline', count: byKind('deadline') },
             { id: 'overdue', label: 'Overdue', count: byKind('overdue') },
             { id: 'transfer', label: 'Transfer', count: byKind('transfer') },
@@ -180,6 +181,9 @@ export default function AlertsScreen() {
                       <a className="btn btn-sm" href="#/my-work">
                         Open transfer queue
                       </a>
+                    )}
+                    {n.entityType === 'suggestion' && n.kind === 'm2_handoff' && !n.redacted && (
+                      <a className="btn btn-sm" href={'#/overlaps/' + n.entityId}>Open overlap review</a>
                     )}
                     {n.entityType === 'alert' && (
                       <a className="btn btn-sm" href={`#/coordination/${n.entityId}`}>

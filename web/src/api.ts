@@ -269,6 +269,32 @@ export interface CaseDetail {
   canViewContent: boolean;
 }
 
+
+export type M2Candidate = Suggestion & {
+  caseA: Suggestion['caseA'] & { institutionName: string; institutionPermanentId: string };
+  caseB: Suggestion['caseB'] & { institutionName: string; institutionPermanentId: string };
+  evidenceSignals: number;
+  lexicalJaccard: number | null;
+  semanticSimilarity: null;
+  scoringNote: string;
+  handoffCount: number;
+};
+export interface M2Queue {
+  rows: M2Candidate[];
+  page: number;
+  pageSize: number;
+  pages: number;
+  total: number;
+  counts: { visibleCandidates: number; awaitingReview: number; sentForReview: number };
+  matchingMode: string;
+  ruleVersion: string;
+  categoryOptions: string[];
+}
+export interface M2Detail {
+  candidate: M2Candidate;
+  supervisors: { id: string; displayName: string }[];
+}
+
 export interface CoordinationAlert {
   id: string;
   state: string;
@@ -403,6 +429,11 @@ export const api = {
   attachmentUrl: (caseId: string, attachmentId: string) => `/api/cases/${caseId}/attachments/${attachmentId}`,
   downloadAttachment: (caseId: string, attachmentId: string, filename: string) =>
     downloadFile(`/api/cases/${caseId}/attachments/${attachmentId}`, filename),
+  m2Queue: (query: URLSearchParams) => get<M2Queue>('/m2/suggestions?' + query.toString()),
+  m2Detail: (id: string) => get<M2Detail>('/m2/suggestions/' + encodeURIComponent(id)),
+  m2Handoff: (id: string, supervisorId: string, reason: string, caseAVersion: number, caseBVersion: number) =>
+    post<{ handoffId: string; sentAt: string; state: string }>('/m2/suggestions/' + encodeURIComponent(id) + '/handoff',
+      { supervisorId, reason, caseAVersion, caseBVersion }),
   coordination: () => get<{ overlaps: CoordinationAlert[]; matchingMode: string; ruleVersion: string }>('/coordination'),
   acknowledgeAlert: (id: string) => post<{ ok: true }>(`/alerts/${id}/acknowledge`),
   decideSuggestion: (id: string, decision: string, reason: string, caseAVersion?: number, caseBVersion?: number) =>
