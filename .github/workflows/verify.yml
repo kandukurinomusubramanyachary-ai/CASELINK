@@ -23,6 +23,8 @@ jobs:
         if: always()
         with:
           name: verification-logs
+          include-hidden-files: true
           path: |
             .runtime/verification-*/**/*.log
             .runtime/verification-*/results.json
+            .runtime/verification-*/screenshots/*.png
