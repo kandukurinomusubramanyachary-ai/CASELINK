@@ -233,6 +233,23 @@ if (!alertWithPair || !decidablePair) {
   await page.click('button:has-text("Save decision")');
   await page.waitForTimeout(2500);
   const afterLink = await text(page);
+  // M1 slice 1: after human relationship approval, the owning bureau lead has a visible
+  // handoff to the existing, server-protected case assignment workflow. It must never
+  // imply that approval itself reassigned either case.
+  const handoff = page.locator('.m1-owner-handoff').first();
+  const handoffVisible = (await handoff.count()) > 0;
+  const handoffLinks = handoffVisible ? await handoff.locator('a.m1-assign-handoff').count() : 0;
+  const handoffTargets = handoffVisible
+    ? await handoff.locator('a.m1-assign-handoff').evaluateAll((links) => links.map((link) => link.getAttribute('href')))
+    : [];
+  check(
+    'M1-01',
+    'Reviewed overlapping cases offer a lead-only assignment handoff without changing ownership',
+    handoffVisible && handoffLinks === 2 &&
+      [decidablePair.caseA.id, decidablePair.caseB.id].every((id) => handoffTargets.includes(`#/cases/${id}`)) &&
+      afterLink.includes('automatically assigns, transfers or disposes'),
+    `handoff shown=${handoffVisible}; lead assignment links=${handoffLinks}; target cases=${handoffTargets.join(',')}`
+  );
   page.on('dialog', async (d) => d.accept('T06 interface check: the link was recorded in error and is revoked.'));
   const revoke = page.locator(`button:has-text("Revoke")`).first();
   const hadRevoke = (await revoke.count()) > 0;
