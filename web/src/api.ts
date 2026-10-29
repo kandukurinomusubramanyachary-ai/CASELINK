@@ -434,6 +434,10 @@ export const api = {
   m2Handoff: (id: string, supervisorId: string, reason: string, caseAVersion: number, caseBVersion: number) =>
     post<{ handoffId: string; sentAt: string; state: string }>('/m2/suggestions/' + encodeURIComponent(id) + '/handoff',
       { supervisorId, reason, caseAVersion, caseBVersion }),
+  m4Decision: (id: string) => get<unknown>(`/m4/decisions/${encodeURIComponent(id)}`),
+  m4SaveDraft: (id: string, body: Record<string,unknown>) => post<unknown>(`/m4/decisions/${encodeURIComponent(id)}/draft`,body),
+  m4Confirm: (id: string, body: Record<string,unknown>, idempotencyKey: string) => request<unknown>(`/m4/decisions/${encodeURIComponent(id)}/confirm`,{method:'POST',body:JSON.stringify(body),headers:{'Idempotency-Key':idempotencyKey}}),
+  m4Reverse: (id: string, body: Record<string,unknown>, idempotencyKey: string) => request<unknown>(`/m4/decisions/${encodeURIComponent(id)}/reverse`,{method:'POST',body:JSON.stringify(body),headers:{'Idempotency-Key':idempotencyKey}}),
   m3Reviews: () => get<unknown>('/m3/reviews'),
   m3Review: (id: string) => get<unknown>(`/m3/reviews/${encodeURIComponent(id)}`),
   m3ReviewAction: (id: string, action: string, reason: string, expectedVersion: number) =>

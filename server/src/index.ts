@@ -9,6 +9,7 @@ import { db, DATA_DIR, DB_PATH, UPLOAD_DIR, nowIso, uid, sha256, audit, nextCase
 import { MIGRATIONS } from './migrations.js';
 import { registerM2Routes } from './m2.js';
 import { registerM3Routes } from './m3.js';
+import { registerM4Routes } from './m4.js';
 
 /** The schema version this build writes into operator-facing notes. */
 const CURRENT_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version;
@@ -1787,6 +1788,7 @@ app.get(
 
 registerM2Routes(app);
 registerM3Routes(app);
+registerM4Routes(app);
 
 app.post(
   '/api/alerts/:id/acknowledge',

@@ -1,0 +1,66 @@
+name: M4 focused API and browser gates
+on:
+  push:
+    branches: [feat/m4-relationship-decisions-secure]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  m3-focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck && npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: M4 relationship decision security and DB assertions
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CASELINK_DATA_DIR="$RUNNER_TEMP/m4-api-data"
+          export CASELINK_DB="$CASELINK_DATA_DIR/caselink.db"
+          export CASELINK_DEMO=false CASELINK_TEST_HOOKS=true
+          export BASE=http://127.0.0.1:8107 PORT=8107
+          mkdir -p "$CASELINK_DATA_DIR"
+          node --import tsx server/src/seed.ts --force
+          node --import tsx server/src/index.ts > "$RUNNER_TEMP/m4-api-server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in {1..100}; do
+            if curl -fsS "$BASE/api/health" >/dev/null 2>&1; then break; fi
+            if ! kill -0 "$server_pid" 2>/dev/null; then cat "$RUNNER_TEMP/m4-api-server.log"; exit 1; fi
+            sleep .2
+          done
+          node test/m4-relationship.mjs
+      - name: M4 Playwright desktop/mobile
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CASELINK_DATA_DIR="$RUNNER_TEMP/m4-ui-data"
+          export CASELINK_DB="$CASELINK_DATA_DIR/caselink.db"
+          export CASELINK_DEMO=false CASELINK_TEST_HOOKS=true
+          export BASE=http://127.0.0.1:8108 PORT=8108
+          export CASELINK_SCREENSHOT_DIR="$RUNNER_TEMP/m4-screenshots"
+          mkdir -p "$CASELINK_DATA_DIR" "$CASELINK_SCREENSHOT_DIR"
+          node --import tsx server/src/seed.ts --force
+          node --import tsx server/src/index.ts > "$RUNNER_TEMP/m4-ui-server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in {1..100}; do
+            if curl -fsS "$BASE/api/health" >/dev/null 2>&1; then break; fi
+            if ! kill -0 "$server_pid" 2>/dev/null; then cat "$RUNNER_TEMP/m4-ui-server.log"; exit 1; fi
+            sleep .2
+          done
+          node test/m4-ui.mjs
+          node scripts/prepare-m3-m4-demo.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m4-focused-screenshots
+          path: ${{ runner.temp }}/m4-screenshots/*.png
+          if-no-files-found: ignore

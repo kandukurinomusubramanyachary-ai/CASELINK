@@ -53,6 +53,7 @@ export function matchRoute(route: string): { name: string; param?: string; query
   if (parts[0] === 'cases' && parts[1]) return { name: 'case', param: parts[1], query };
   if (parts[0] === 'institutions' && parts[1]) return { name: 'institution', param: parts[1], query };
   if (parts[0] === 'overlaps' && parts[1]) return { name: 'overlaps', param: parts[1], query };
+  if (parts[0] === 'relationship-decision' && parts[1]) return { name: 'relationship-decision', param: parts[1], query };
   if (parts[0] === 'supervisor-review' && parts[1]) return { name: 'supervisor-review', param: parts[1], query };
   if (parts[0] === 'coordination' && parts[1]) return { name: 'coordination-focus', param: parts[1], query };
   return { name: parts[0], query };
@@ -558,6 +559,7 @@ import CasesScreen from './screens/Cases';
 import CaseWorkspace from './screens/CaseWorkspace';
 import CoordinationScreen from './screens/Coordination';
 import SupervisorReviewScreen from './screens/SupervisorReview';
+import RelationshipDecisionScreen from './screens/RelationshipDecision';
 import OverlapDetectionScreen from './screens/OverlapDetection';
 import AlertsScreen from './screens/Alerts';
 import ReportsScreen from './screens/Reports';
@@ -583,6 +585,8 @@ function RouteView({ match }: { route: string; match: ReturnType<typeof matchRou
       return <CoordinationScreen focus={match.param} />;
     case 'supervisor-review':
       return <SupervisorReviewScreen focus={match.param} />;
+    case 'relationship-decision':
+      return <RelationshipDecisionScreen id={match.param!} />;
     case 'alerts':
       return <AlertsScreen />;
     case 'reports':

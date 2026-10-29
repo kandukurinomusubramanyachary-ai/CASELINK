@@ -11,6 +11,7 @@
     "dev": "node --import tsx server/src/index.ts",
     "typecheck": "tsc --noEmit",
     "seed": "node --import tsx server/src/seed.ts --force",
+    "demo:m3-m4": "node scripts/prepare-m3-m4-demo.mjs",
     "test:acceptance": "node test/acceptance.mjs",
     "test:ui": "node test/ui-smoke.mjs",
     "bench": "node test/bench.mjs",
