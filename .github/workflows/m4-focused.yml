@@ -57,6 +57,7 @@ jobs:
             sleep .2
           done
           node test/m4-ui.mjs
+          node scripts/prepare-m3-m4-demo.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
