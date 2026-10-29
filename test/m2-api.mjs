@@ -151,6 +151,24 @@ if (pairAB && pairAC) {
         assert.ok(after.prepare('SELECT id FROM notifications WHERE entity_id = ? AND kind = ?').get(pairAB.id,'m2_handoff'));
       } finally { after.close(); }
     });
+    await check('handoff notifications recheck both-case scope after recipient region changes', async () => {
+      const sql = new Database(DB);
+      const recipientRow = sql.prepare('SELECT username, region FROM users WHERE id = ?').get(recipient);
+      assert.ok(recipientRow);
+      const token = await login(recipientRow.username);
+      try {
+        const before = await req('GET','/notifications',token);
+        assert.equal(before.status,200);
+        assert.ok(before.data.notifications.some((n) => n.kind === 'm2_handoff' && n.entityId === pairAB.id));
+        sql.prepare('UPDATE users SET region = ? WHERE id = ?').run('__no_matching_region__',recipient);
+        const after = await req('GET','/notifications',token);
+        assert.equal(after.status,200);
+        assert.ok(!after.data.notifications.some((n) => n.kind === 'm2_handoff' && n.entityId === pairAB.id));
+      } finally {
+        sql.prepare('UPDATE users SET region = ? WHERE id = ?').run(recipientRow.region,recipient);
+        sql.close();
+      }
+    });
     await check('duplicate handoff is blocked without duplicate notification', async () => {
       const again = await req('POST','/m2/suggestions/'+pairAB.id+'/handoff',lead,request);
       assert.equal(again.status,409);
