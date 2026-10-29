@@ -323,6 +323,45 @@ export default function CoordinationScreen({ focus }: { focus?: string }) {
                         {r.reason}
                       </p>
                       {r.revokedReason && <p className="small muted">Revoked: {r.revokedReason}</p>}
+                      {r.state === 'active' && (
+                        <div className="evidence-card m1-owner-handoff" style={{ marginTop: 12 }}>
+                          <div className="row-between">
+                            <strong>Next step: assign officers</strong>
+                            <Pill tone="blue">Human assignment</Pill>
+                          </div>
+                          <p className="small muted" style={{ marginTop: 6 }}>
+                            The relationship has been reviewed. The original complaints are still separate records.
+                            Each owning bureau lead must confirm who handles their case; approving a link never
+                            automatically assigns, transfers or disposes either complaint.
+                          </p>
+                          <div className="stack-sm" style={{ marginTop: 10 }}>
+                            {[r.caseA, r.caseB].map((c, i) => (
+                              <div key={c.id} className="row-between" style={{ gap: 8 }}>
+                                <span className="small">
+                                  {c.access === 'hidden' || !c.caseNumber ? (
+                                    <span className="muted">Linked case {i + 1}: outside your permitted view</span>
+                                  ) : (
+                                    <>
+                                      <a className="case-number" href={`#/cases/${c.id}`}>{c.caseNumber}</a>
+                                      {' · '}{c.bureau} owning bureau
+                                    </>
+                                  )}
+                                </span>
+                                {c.access !== 'hidden' && c.caseNumber &&
+                                 session.user?.role === 'bureau_lead' &&
+                                 session.user.bureau === c.bureau &&
+                                 (session.user.region == null || session.user.region === alert.institution.region) ? (
+                                  <a className="btn btn-sm m1-assign-handoff" href={`#/cases/${c.id}`}>
+                                    Open to assign
+                                  </a>
+                                ) : (
+                                  <span className="small muted">Owning bureau lead assigns</span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       {r.state === 'active' && r.canRevoke && (
                         <button
                           type="button"
