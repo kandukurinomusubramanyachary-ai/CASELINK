@@ -135,9 +135,25 @@ await check('M4 refuses stale complaint versions before changing a relationship'
 });
 let sameDecision;
 await check('SAME confirms canonical pair while preserving both complaint originals',async()=>{
+  // Publish actual synthetic evidence for BOTH cases before deciding; verify byte
+  // metadata and all preexisting history IDs survive the subsequent link.
+  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Ya8VV4AAAAASUVORK5CYII=','base64');
+  for(const [i,c] of same.cases.entries()){
+    const before=await call('GET','/cases/'+c.id,lead);
+    assert.equal(before.status,200);
+    const form=new FormData();
+    form.append('version',String(before.data.case.version));
+    form.append('file',new Blob([png],{type:'image/png'}),'m4-source-'+i+'.png');
+    const upload=await fetch(BASE+'/api/cases/'+c.id+'/attachments',{
+      method:'POST',headers:{authorization:'Bearer '+lead},body:form,
+    });
+    assert.equal(upload.status,201,await upload.text());
+  }
   const d=(await get(same)).data;
   const original=openDb();
   const history=same.cases.map(c=>original.prepare('SELECT id FROM action_events WHERE case_id=?').all(c.id).map(x=>x.id));
+  const evidence=same.cases.map(c=>original.prepare('SELECT id,sha256 FROM attachments WHERE case_id=? ORDER BY id').all(c.id));
+  assert.ok(evidence.every(files=>files.length===1),'Both original complaint files must exist before linking');
   const owners=same.cases.map(c=>original.prepare('SELECT bureau,status,assigned_officer_id FROM cases WHERE id=?').get(c.id));
   original.close();
   const result=await call('POST','/m4/decisions/'+same.id+'/confirm',supervisor,body(d,'Same'),'m4-same-'+stamp);
@@ -158,6 +174,8 @@ await check('SAME confirms canonical pair while preserving both complaint origin
       assert.deepEqual(row,owners[i]);
       const after=new Set(verify.prepare('SELECT id FROM action_events WHERE case_id=?').all(same.cases[i].id).map(x=>x.id));
       for(const oldId of history[i])assert.ok(after.has(oldId),'Existing history was deleted');
+      assert.deepEqual(verify.prepare('SELECT id,sha256 FROM attachments WHERE case_id=? ORDER BY id').all(same.cases[i].id),
+        evidence[i],'Original evidence must be preserved byte-identically');
     }
   }finally{verify.close();}
 });
