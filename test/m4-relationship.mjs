@@ -161,6 +161,8 @@ await check('SAME confirms canonical pair while preserving both complaint origin
   sameDecision=result.data;
   assert.equal(result.data.type,'Same');
   assert.ok(result.data.relationshipId);
+  const approved=(await get(same)).data;
+  assert.equal(approved.assignmentBoundary.status,'available_for_future_m5');
   const verify=openDb();
   try{
     const dbRelation=verify.prepare('SELECT * FROM relationships WHERE id=?').get(result.data.relationshipId);
@@ -289,6 +291,8 @@ await check('SEPARATE decision persists a negative relationship without a link',
     'm4-separate-'+stamp);
   assert.equal(res.status,200,JSON.stringify(res.data));
   assert.equal(res.data.relationshipId,null);
+  const independent=(await get(separate)).data;
+  assert.equal(independent.assignmentBoundary,null,'Separate complaints must not be grouped for M5');
   const db=openDb();
   try{
     assert.equal(db.prepare('SELECT decision FROM m4_decisions WHERE id=?').get(res.data.decisionId).decision,'Separate');
