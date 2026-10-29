@@ -1076,7 +1076,8 @@ export function decideRelationship(
   suggestionId: string,
   decision: 'Related issue' | 'Duplicate report' | 'Separate issues',
   reason: string,
-  expected: { caseA?: number | null; caseB?: number | null } = {}
+  expected: { caseA?: number | null; caseB?: number | null } = {},
+  fromM4 = false
 ): { relationshipId: string | null } {
   const s = db.prepare('SELECT * FROM suggestions WHERE id = ?').get(suggestionId) as
     | {
@@ -1108,6 +1109,13 @@ export function decideRelationship(
       `relationship_decision_denied suggestion=${s.id} cases=${a.id},${b.id} ${describeAuthority(actor)}`
     );
     throw new AppError(403, 'access_denied', relationshipDenialReason(actor, a, b));
+  }
+  // Once handed to the M3/M4 process, the legacy decision route must never
+  // bypass the mandatory accepted supervisor review. M4 invokes this service
+  // only after independently enforcing its recipient, grant and review gate.
+  if (!fromM4 && db.prepare('SELECT 1 FROM m2_review_handoffs WHERE suggestion_id=? LIMIT 1').get(s.id)) {
+    throw new AppError(409,'supervisor_review_required',
+      'This candidate has been handed off for an authorized supervisor decision.');
   }
   // Authority is decided before the request body is validated: an unauthorised caller is refused for
   // what it is (403), and never learns which fields the workflow would have required.
@@ -1201,7 +1209,8 @@ export function revokeRelationship(
   actor: SessionUser,
   relationshipId: string,
   reason: string,
-  expected: { caseA?: number | null; caseB?: number | null } = {}
+  expected: { caseA?: number | null; caseB?: number | null } = {},
+  fromM4 = false
 ): void {
   const r = db.prepare('SELECT * FROM relationships WHERE id = ?').get(relationshipId) as
     | { id: string; case_a_id: string; case_b_id: string; state: string; suggestion_id: string | null }
@@ -1216,6 +1225,13 @@ export function revokeRelationship(
       `relationship_revoke_denied relationship=${r.id} cases=${a.id},${b.id} ${describeAuthority(actor)}`
     );
     throw new AppError(403, 'access_denied', relationshipDenialReason(actor, a, b));
+  }
+  // M4 owns the decision ledger and immutable audit for its relationships.
+  // A legacy revoke would change the link without updating the M4 ledger.
+  if (!fromM4 && db.prepare(
+    "SELECT 1 FROM m4_decisions WHERE relationship_id=? AND state='confirmed' LIMIT 1"
+  ).get(r.id)) {
+    throw new AppError(409,'m4_reversal_required','Reverse this relationship through M4.');
   }
   requireBothVersions(expected);
   if (!reason || reason.trim().length < 5) {
