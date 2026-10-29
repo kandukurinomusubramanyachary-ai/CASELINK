@@ -137,7 +137,7 @@ if (pairAB && pairAC) {
     try { before = database.prepare('SELECT COUNT(*) AS n FROM relationships').get().n; }
     finally { database.close(); }
     await check('handoff rejects a stale case version', async () => {
-      const stale = await req('POST','/m2/suggestions/'+pairAB.id+'/handoff',lead,{...request,caseAVersion:0});
+      const stale = await req('POST','/m2/suggestions/'+pairAB.id+'/handoff',lead,{...request,caseAVersion:pairAB.caseA.version + 1});
       assert.equal(stale.status,409);
     });
     await check('handoff is durable and returns 201 with no relationship decision', async () => {
