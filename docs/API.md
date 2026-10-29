@@ -7,6 +7,12 @@ frames that block cookies. There is no client-supplied role.
 **Sign-in is required by default.** `POST /auth/demo-login` — the passwordless fixture entry — exists only
 when the server is started with `CASELINK_DEMO=true`; in every other configuration it returns `403`. The
 default deployment publishes no demo accounts, no demo password and no identity switcher.
+Normal startup does not seed accounts or complaint data. Provision the first administrator explicitly
+with `npm run bootstrap:admin`; use demo mode or an explicit seed command only for synthetic fixtures.
+
+Unsafe browser requests must have a same-host Origin and must not have `Sec-Fetch-Site: cross-site`.
+Non-browser clients can use the existing Bearer transport. Login inputs are bounded to a 60-character
+username and a 256-character password; repeated failed logins return `429` with `Retry-After`.
 
 ## Authorisation model
 
@@ -118,7 +124,7 @@ Consequences enforced over HTTP:
 | --- | --- | --- |
 | `GET` | `/coordination` | institution overlaps visible to the caller, permitted case references, suggestions with evidence, recorded relationships, matching mode |
 | `POST` | `/alerts/:id/acknowledge` | acknowledgement is awareness, not resolution. Authorised against the alert's institution region and listed cases (403 outside the caller's region) |
-| `POST` | `/suggestions/:id/decision` | `{ decision: 'Related issue' \| 'Duplicate report' \| 'Separate issues', reason }` |
+| `POST` | `/suggestions/:id/decision` | `{ decision: 'Related issue' \| 'Duplicate report' \| 'Separate issues', reason, caseAVersion, caseBVersion }`; both versions are required |
 | `GET` | `/relationships` | reviewer-confirmed links visible to the caller |
 | `POST` | `/relationships/:id/revoke` | revoke with a required reason; both cases stay intact |
 
@@ -144,7 +150,7 @@ a fault-injection test hook.
 
 | Method | Path | Notes |
 | --- | --- | --- |
-| `GET` | `/system/status` | public environment label, scheduler state, matching mode, deadline policies, database, seed time — no restricted data |
+| `GET` | `/system/status` | authenticated scheduler/matching state; includes `pendingJobs`, `retryingJobs`, `failedJobs`, `oldestPendingAt` and a redacted `lastError` |
 | `POST` | `/system/worker/tick` | run the scheduled deadline/escalation scan now (admin) |
 | `POST` | `/system/matching-mode` | switch between `rule-based` and `unavailable` to demonstrate the outage path (admin) |
 | `POST` | `/system/inject-audit-failure` | fault injection to prove atomic rollback (T12); admin + demo/test hooks only |

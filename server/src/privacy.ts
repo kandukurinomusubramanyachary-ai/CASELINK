@@ -197,6 +197,7 @@ export function projectRelationship(user: SessionUser, r: RelationshipRow) {
           category: c.category,
           bureau: c.bureau,
           status: c.status,
+          version: c.version,
           access: canReadCaseContent(user, c) ? ('full' as const) : ('restricted' as const),
         }
       : { id: c.id, access: 'hidden' as const };

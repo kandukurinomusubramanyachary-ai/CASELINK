@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import fs from 'node:fs';
 
 const BASE = process.env.BASE ?? 'http://127.0.0.1:8080';
-const shots = 'docs/screenshots';
+const shots = process.env.CASELINK_SCREENSHOT_DIR ?? 'docs/screenshots';
 fs.mkdirSync(shots, { recursive: true });
 
 const browser = await chromium.launch({ args: ['--no-sandbox'] });

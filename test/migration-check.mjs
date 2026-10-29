@@ -67,7 +67,7 @@ if (!preMigration) {
 
 /* -------------------------------------------------------- 2. migrate twice */
 const run = (dataDir) =>
-  execFileSync('npx', ['tsx', 'server/src/migrate.ts'], {
+  execFileSync(process.execPath, ['--import', 'tsx', 'server/src/migrate.ts'], {
     cwd: repo,
     env: { ...process.env, CASELINK_DATA_DIR: dataDir },
     encoding: 'utf8',
@@ -80,7 +80,7 @@ check('1. the migration run reports the version it reached', /already at version
 check('2. a second run applies nothing (idempotent)', /applied: none \(already current\)/.test(secondRun), secondRun.trim().split('\n')[2]);
 
 /* -------------------------------------------------- 3. fresh database path */
-execFileSync('npx', ['tsx', 'server/src/seed.ts', '--force'], {
+execFileSync(process.execPath, ['--import', 'tsx', 'server/src/seed.ts', '--force'], {
   cwd: repo,
   env: { ...process.env, CASELINK_DATA_DIR: freshDir },
   encoding: 'utf8',

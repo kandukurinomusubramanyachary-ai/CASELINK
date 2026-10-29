@@ -111,22 +111,19 @@ check(
     showsSignIn && !leaksCases && apiStatus === 401,
     `sign-in shown=${showsSignIn}, case numbers visible=${leaksCases}, GET /api/cases without a session=${apiStatus}`
   );
-  // Keyboard: the first Tab should land on a form control on the sign-in screen, in document order.
-  await anonPage.keyboard.press('Tab');
-  const firstFocus = await anonPage.evaluate(() => {
-    const el = document.activeElement;
-    return el ? `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}` : 'none';
-  });
-  await anonPage.keyboard.press('Tab');
-  const secondFocus = await anonPage.evaluate(() => {
-    const el = document.activeElement;
-    return el ? `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}` : 'none';
-  });
+  // Header links and theme controls precede the form. Both fields must remain reachable in order.
+  const focused = [];
+  for (let i = 0; i < 12; i++) {
+    await anonPage.keyboard.press('Tab');
+    focused.push(await anonPage.evaluate(() => document.activeElement?.id ?? ''));
+    if (focused.at(-1) === 'password') break;
+  }
+  const usernameIndex = focused.indexOf('username');
   check(
     'U04',
     'The sign-in screen is operable from the keyboard alone (Tab reaches both fields, in order)',
-    firstFocus === 'input#username' && secondFocus === 'input#password',
-    `first Tab → ${firstFocus}, second Tab → ${secondFocus}`
+    usernameIndex >= 0 && focused.indexOf('password') === usernameIndex + 1,
+    `tab order: ${focused.filter(Boolean).join(' → ')}`
   );
   await anon.close();
 }
@@ -155,10 +152,10 @@ check(
 const reviewButton = page.locator('.evidence-card button:has-text("Review")').first();
 if (await reviewButton.count()) {
   await reviewButton.click();
-  await page.waitForSelector('[role=dialog]', { timeout: 10_000 });
+  await page.getByRole('dialog').waitFor({ state: 'visible', timeout: 10_000 });
   await page.keyboard.press('Escape');
   await page.waitForTimeout(600);
-  const dialogGone = (await page.locator('[role=dialog]').count()) === 0;
+  const dialogGone = !(await page.getByRole('dialog').isVisible());
   check('U06', 'Escape closes a review dialog and the screen stays usable', dialogGone, `dialog closed=${dialogGone}`);
 } else {
   skip('U06', 'Escape closes a review dialog and the screen stays usable', 'no reviewable suggestion is offered to this account on this database');

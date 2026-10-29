@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { createServer } from 'node:net';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -6,6 +6,8 @@ import Database from 'better-sqlite3';
 
 await fs.mkdir('.runtime', { recursive: true });
 const dataDir = await fs.mkdtemp(path.resolve('.runtime/search-access-'));
+const seeded = spawnSync(process.execPath, ['--import', 'tsx', 'server/src/seed.ts', '--force'], { env: { ...process.env, CASELINK_DATA_DIR: dataDir }, encoding: 'utf8' });
+if (seeded.status !== 0) throw new Error(`Synthetic fixture setup failed: ${seeded.stderr}`);
 const port = await new Promise(resolve => { const server = createServer(); server.listen(0, '127.0.0.1', () => { const selected = server.address().port; server.close(() => resolve(selected)); }); });
 const child = spawn(process.execPath, ['--import', 'tsx', 'server/src/index.ts'], { env: { ...process.env, PORT: String(port), CASELINK_DEMO: 'false', CASELINK_DATA_DIR: dataDir }, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
 const base = `http://127.0.0.1:${port}`;

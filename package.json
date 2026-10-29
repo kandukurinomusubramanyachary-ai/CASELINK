@@ -6,28 +6,34 @@
   "description": "CaseLink - SIH26264 institution complaint coordination prototype (synthetic data only)",
   "scripts": {
     "build": "vite build",
-    "start": "npm run build && tsx server/src/index.ts",
-    "serve": "tsx server/src/index.ts",
-    "dev": "tsx server/src/index.ts",
+    "start": "npm run build && node --import tsx server/src/index.ts",
+    "serve": "node --import tsx server/src/index.ts",
+    "dev": "node --import tsx server/src/index.ts",
     "typecheck": "tsc --noEmit",
-    "seed": "tsx server/src/seed.ts --force",
+    "seed": "node --import tsx server/src/seed.ts --force",
     "test:acceptance": "node test/acceptance.mjs",
     "test:ui": "node test/ui-smoke.mjs",
     "bench": "node test/bench.mjs",
     "test:login": "node test/login-check.mjs",
-    "setup": "bash start.sh --setup-only || true",
+    "setup": "bash start.sh --setup-only",
+    "bootstrap:admin": "node --import tsx server/src/bootstrap-admin.ts",
+    "test:reliability": "node --test test/reliability.mjs",
+    "verify": "node test/verify.mjs",
     "test:direct": "node test/direct-entry.mjs",
     "test:security": "node test/security-m1.mjs",
     "test:demo": "node test/demo-mode.mjs",
     "test:m1": "bash test/run-m1.sh",
     "test:regional": "node test/security-m1-1.mjs"
   },
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
     "better-sqlite3": "^11.5.0",
     "express": "^4.21.1",
     "multer": "^2.5.0",
-    "zod": "^3.23.8"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.11",

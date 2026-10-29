@@ -7,19 +7,23 @@ cd "$(dirname "$0")"
 export PORT="${PORT:-8080}"
 # Authenticated sign-in is the default. Set CASELINK_DEMO=true explicitly for fixture entry.
 export CASELINK_DEMO="${CASELINK_DEMO:-false}"
+if [ "${1:-}" != "" ] && [ "$1" != "--setup-only" ]; then
+  echo "Usage: bash start.sh [--setup-only]" >&2
+  exit 2
+fi
 
 if [ ! -d node_modules ] || [ ! -d node_modules/express ]; then
   echo "[caselink] installing dependencies…"
-  npm install --no-audit --no-fund
+  npm ci --no-audit --no-fund
 fi
 if [ ! -f web/dist/index.html ] || [ -n "$(find web/src server/src -newer web/dist/index.html -print -quit 2>/dev/null)" ]; then
   echo "[caselink] building interface…"
   npx vite build
 fi
-if [ ! -f data/caselink.db ]; then
-  echo "[caselink] seeding demo data…"
-  npx tsx server/src/seed.ts --force
+if [ "${1:-}" = "--setup-only" ]; then
+  echo "[caselink] setup complete"
+  exit 0
 fi
 echo "[caselink] demo mode: ${CASELINK_DEMO} (passwordless fixture entry requires CASELINK_DEMO=true)"
 echo "[caselink] starting on port ${PORT}"
-exec npx tsx server/src/index.ts
+exec node --import tsx server/src/index.ts
