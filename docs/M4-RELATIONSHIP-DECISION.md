@@ -67,6 +67,32 @@ separate seeded synthetic databases. This covers:
 `.github/workflows/m4-focused.yml` runs fast isolated API and browser gates; the shared
 submission verification runs the full repository suite.
 
+## Private interactive preview (no public deployment)
+
+ChatGPT Sites has no verified deployable backend for this local SQLite service here. Use a
+private GitHub Codespace or local machine; the app, API and SQLite are fully connected.
+
+In the repository branch `feat/m4-relationship-decisions-secure`:
+
+```bash
+npm ci
+export CASELINK_DATA_DIR=/tmp/caselink-review-preview
+npm run seed
+CASELINK_DEMO=false npm start
+```
+
+In a second terminal in the same workspace:
+
+```bash
+npm run demo:m3-m4
+```
+
+Open the M3 URL printed by that command on port 8080. The demo fixture creates
+**real synthetic database rows** and a real M2 handoff, but makes no review or relationship
+decisions for you. Login as `a.desai` / `caselink-demo`, test M3, then accept for M4.
+Use the Codespaces **Ports** panel to open port 8080 privately; keep it private.
+The link is created by your own Codespace and cannot be claimed or verified here.
+
 ## Exact manual test
 
 1. On a fresh synthetic database, sign in as seeded bureau lead `m.nair`.
