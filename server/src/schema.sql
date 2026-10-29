@@ -331,3 +331,27 @@ CREATE TABLE IF NOT EXISTS jobs (
   completed_at TEXT
 );
 CREATE INDEX IF NOT EXISTS jobs_pending_idx ON jobs(state, run_after);
+
+
+-- M3 supervisor review state and immutable action history (separate from complaint history).
+CREATE TABLE IF NOT EXISTS m3_reviews (
+  id TEXT PRIMARY KEY,
+  handoff_id TEXT NOT NULL UNIQUE REFERENCES m2_review_handoffs(id),
+  state TEXT NOT NULL CHECK (state IN ('pending','needs_review','awaiting_evidence','accepted')),
+  note TEXT,
+  version INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL,
+  accepted_at TEXT
+);
+CREATE TABLE IF NOT EXISTS m3_review_events (
+  id TEXT PRIMARY KEY,
+  handoff_id TEXT NOT NULL REFERENCES m2_review_handoffs(id),
+  actor_id TEXT NOT NULL REFERENCES users(id),
+  action TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  from_state TEXT NOT NULL,
+  to_state TEXT NOT NULL,
+  at TEXT NOT NULL,
+  version_after INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS m3_review_events_by_handoff ON m3_review_events(handoff_id, at);
