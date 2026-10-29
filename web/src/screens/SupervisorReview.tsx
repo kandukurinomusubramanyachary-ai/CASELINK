@@ -68,6 +68,7 @@ export default function SupervisorReviewScreen({ focus }: { focus?: string }) {
   const [detail,setDetail]=useState<ReviewDetail|null>(null);
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState('');
+  const [notice,setNotice]=useState('');
   const [reason,setReason]=useState('');
   const [action,setAction]=useState<ReviewAction>('accept');
   const [saving,setSaving]=useState(false);
@@ -98,8 +99,13 @@ export default function SupervisorReviewScreen({ focus }: { focus?: string }) {
     if(!detail || reason.trim().length < 10 || saving)return;
     setSaving(true);setError('');
     try{
-      const result=await api.m3ReviewAction(detail.id,action,reason,detail.review.version) as { detail: ReviewDetail };
+      const result=await api.m3ReviewAction(detail.id,action,reason,detail.review.version) as {
+        detail: ReviewDetail; notificationsSent: number;
+      };
       setDetail(result.detail);setReason('');
+      setNotice(action==='request_evidence'
+        ? 'Evidence request recorded. '+result.notificationsSent+' owning lead in-app notifications delivered.'
+        : 'Supervisor action recorded in the review audit history.');
     }catch(e){const err=e as ApiError;setError(err.status===409?'Another update occurred. Reload this review and try again.':err.message);}
     finally{setSaving(false);}
   };
@@ -109,6 +115,7 @@ export default function SupervisorReviewScreen({ focus }: { focus?: string }) {
     <header className="m3-heading"><div><p className="m3-kicker">CASELINK / Overlap Detection</p>
       <h1>M3 — Supervisor Review</h1><p>Independent, evidence-first review of potentially overlapping institutional grievances.</p></div>
       <span className="m3-permission">◈ Current supervisor access is verified on every request</span></header>
+    {notice&&<div className="m3-success" role="status">{notice}</div>}
     {error&&<div className="m3-error" role="alert">{error} <button type="button" onClick={()=>void load(selected)}>Reload</button></div>}
     {previewError&&<div className="m3-error" role="alert">{previewError}</div>}
     {loading?<p role="status">Loading authorized review records…</p>:!detail? <section className="m3-card m3-queue">
