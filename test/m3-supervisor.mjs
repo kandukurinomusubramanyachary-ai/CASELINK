@@ -96,7 +96,10 @@ await check('pair details, preserved independent histories and real factors',asy
   details=r.data;
   assert.ok(details.caseA.summary.includes(stamp));
   assert.ok(details.caseB.summary.includes(stamp));
-  assert.equal(details.comparison.reasons.length,JSON.parse(new Database(DB,{readonly:true}).prepare('SELECT reasons_json FROM suggestions WHERE id=?').get(pair.id).reasons_json).length);
+  const comparisonDb=new Database(DB,{readonly:true});
+  try { assert.equal(details.comparison.reasons.length,
+    JSON.parse(comparisonDb.prepare('SELECT reasons_json FROM suggestions WHERE id=?').get(pair.id).reasons_json).length);
+  } finally { comparisonDb.close(); }
   assert.equal(details.comparison.method.includes('not AI confidence'),true);
   assert.ok(Array.isArray(details.caseA.history)&&Array.isArray(details.caseB.history));
   assert.equal(details.review.state,'pending');
@@ -111,12 +114,13 @@ await check('evidence bytes stay protected after upload',async()=>{
   assert.equal(c.status,200);
   const form=new FormData();
   form.append('version',String(c.data.case.version));
-  form.append('file',new Blob(['M3 synthetic evidence '+stamp],{type:'text/plain'}),'m3-proof.txt');
+  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Ya8VV4AAAAASUVORK5CYII=', 'base64');
+  form.append('file',new Blob([png],{type:'image/png'}),'m3-proof.png');
   const uploaded=await request('POST','/cases/'+cases[0].id+'/attachments',lead,form);
   assert.equal(uploaded.status,201,JSON.stringify(uploaded.data));
   const after=await request('GET','/m3/reviews/'+id,supervisor);
-  const file=after.data.caseA.attachments.find(x=>x.originalName==='m3-proof.txt') ??
-    after.data.caseB.attachments.find(x=>x.originalName==='m3-proof.txt');
+  const file=after.data.caseA.attachments.find(x=>x.originalName==='m3-proof.png') ??
+    after.data.caseB.attachments.find(x=>x.originalName==='m3-proof.png');
   assert.ok(file);
   const url='/m3/reviews/'+id+'/evidence/'+file.id;
   assert.equal((await request('GET',url,null)).status,401);
@@ -124,7 +128,7 @@ await check('evidence bytes stay protected after upload',async()=>{
   assert.equal((await request('GET',url,westSupervisor)).status,404);
   const authorized=await request('GET',url,supervisor);
   assert.equal(authorized.status,200);
-  assert.equal(await authorized.response.text(),'M3 synthetic evidence '+stamp);
+  assert.deepEqual(Buffer.from(await authorized.response.arrayBuffer()),png);
 });
 let version=0;
 async function action(kind,reason,expectedVersion=version) {
