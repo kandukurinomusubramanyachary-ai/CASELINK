@@ -182,7 +182,7 @@ export default function AlertsScreen() {
                         Open transfer queue
                       </a>
                     )}
-                    {n.entityType === 'suggestion' && n.kind === 'm2_handoff' && (
+                    {n.entityType === 'suggestion' && n.kind === 'm2_handoff' && !n.redacted && (
                       <a className="btn btn-sm" href={'#/overlaps/' + n.entityId}>Open overlap review</a>
                     )}
                     {n.entityType === 'alert' && (
