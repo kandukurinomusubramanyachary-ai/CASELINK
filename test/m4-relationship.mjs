@@ -114,6 +114,15 @@ await check('M4 rejects missing reason, missing versions and missing idempotency
     {...body(d,'Same'),caseAVersion:undefined},'m4-badversion')).status,422);
   assert.equal((await call('POST','/m4/decisions/'+same.id+'/confirm',supervisor,body(d,'Same'))).status,422);
 });
+await check('legacy relationship endpoint cannot bypass assigned M3 review',async()=>{
+  const d=(await get(same)).data;
+  const denied=await call('POST','/suggestions/'+same.pair.id+'/decision',lead,{
+    decision:'Related issue',
+    reason:'Legacy route cannot decide a handed-off pair without M4 review.',
+    caseAVersion:d.caseA.version,caseBVersion:d.caseB.version,
+  });
+  assert.equal(denied.status,409);
+});
 await check('M4 refuses stale complaint versions before changing a relationship',async()=>{
   const d=(await get(same)).data;
   const rejected=await call('POST','/m4/decisions/'+same.id+'/confirm',supervisor,{
@@ -203,6 +212,17 @@ await check('reversed case ordering yields identical canonical pair and cannot d
     body(d,'Related','This reversed ordering must not allow a duplicate live relationship.'),
     'm4-reordered-'+stamp);
   assert.equal(denied.status,409);
+});
+await check('legacy relationship revoke cannot bypass M4 immutable audit ledger',async()=>{
+  const d=(await get(same)).data;
+  const attempt=await call('POST','/relationships/'+sameDecision.relationshipId+'/revoke',supervisor,{
+    reason:'Legacy endpoint must not reverse an M4 relationship without audit.',
+    caseAVersion:d.caseA.version,caseBVersion:d.caseB.version,
+  });
+  assert.equal(attempt.status,409);
+  const verify=openDb();
+  assert.equal(verify.prepare('SELECT state FROM relationships WHERE id=?').get(sameDecision.relationshipId).state,'active');
+  verify.close();
 });
 await check('M4 rejects stale versions and cross-region reversals',async()=>{
   const d=(await get(same)).data;
