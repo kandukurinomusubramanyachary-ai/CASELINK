@@ -6,7 +6,7 @@ import type { Express, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { db, uid, nowIso, audit, tx } from './db.js';
 import { requireAuth, recordSecurityDenial, sessionUserById, type SessionUser } from './auth.js';
-import { canViewMetadata, canViewContent, getCase, type CaseRecord } from './domain.js';
+import { CASE_SELECT, canViewMetadata, canViewContent, getCase, type CaseRecord } from './domain.js';
 import { projectSuggestion, withCaseCache, type SuggestionRow } from './privacy.js';
 import { workerState } from './worker.js';
 import { RULE_VERSION_LABEL } from './rules.js';
@@ -41,12 +41,9 @@ function visibleRows(user: SessionUser) {
   for (let i = 0; i < all.length; i += 400) {
     const batch = all.slice(i, i + 400);
     const placeholders = batch.map(() => '?').join(',');
-    const records = db.prepare('SELECT * FROM cases WHERE id IN (' + placeholders + ')').all(...batch) as CaseRecord[];
-    // The shared domain loader adds institution projection columns; use it for policy decisions.
-    records.forEach((c) => {
-      const full = getCase(c.id);
-      if (full) cache.set(c.id, full);
-    });
+    // Bulk-load the same joined record shape used by getCase, not one query per case.
+    const records = db.prepare(CASE_SELECT + ' WHERE c.id IN (' + placeholders + ')').all(...batch) as CaseRecord[];
+    records.forEach((c) => cache.set(c.id, c));
   }
   return {
     cache,
@@ -69,13 +66,14 @@ function factors(row: SuggestionRow, full: boolean) {
     scoringNote: 'Rule-based evidence signals; lexical Jaccard is a wording overlap, not confidence.',
   };
 }
-function project(user: SessionUser, row: SuggestionRow, cache: Map<string, CaseRecord>) {
+function project(user: SessionUser, row: SuggestionRow, cache: Map<string, CaseRecord>, counts?: Map<string, number>) {
   const pair = recordFor(row, cache)!;
   const full = canViewContent(user, pair.a) && canViewContent(user, pair.b);
   const projected = projectSuggestion(user, row);
-  const sent = db.prepare('SELECT COUNT(*) AS n FROM m2_review_handoffs WHERE suggestion_id = ?')
-    .get(row.id) as { n: number };
-  return { ...projected, ...factors(row, full), handoffCount: sent.n };
+  const sent = counts?.get(row.id) ?? (counts ? 0 : (
+    db.prepare('SELECT COUNT(*) AS n FROM m2_review_handoffs WHERE suggestion_id = ?').get(row.id) as { n: number }
+  ).n);
+  return { ...projected, ...factors(row, full), handoffCount: sent };
 }
 function authorizedPair(user: SessionUser, id: string) {
   const row = db.prepare('SELECT * FROM suggestions WHERE id = ?').get(id) as SuggestionRow | undefined;
@@ -113,7 +111,16 @@ export function registerM2Routes(app: Express) {
       throw new AppError(422, 'validation_error', 'Invalid filter or sort.');
     }
     const { rows, cache } = visibleRows(user);
-    const projected = withCaseCache(cache, () => rows.map((r) => project(user, r, cache)));
+    // One aggregate read for all visible handoffs, rather than one query per candidate.
+    const counts = new Map<string, number>();
+    if (rows.length) {
+      const result = db.prepare(
+        'SELECT suggestion_id AS id, COUNT(*) AS n FROM m2_review_handoffs ' +
+        'WHERE suggestion_id IN (SELECT value FROM json_each(?)) GROUP BY suggestion_id'
+      ).all(JSON.stringify(rows.map((r) => r.id))) as { id: string; n: number }[];
+      result.forEach((r) => counts.set(r.id, r.n));
+    }
+    const projected = withCaseCache(cache, () => rows.map((r) => project(user, r, cache, counts)));
     const filtered = projected.filter((s) => {
       if (state !== 'all' && s.state !== state) return false;
       if (category && s.caseA.category !== category && s.caseB.category !== category) return false;
@@ -163,7 +170,7 @@ export function registerM2Routes(app: Express) {
   app.post('/api/m2/suggestions/:id/handoff', requireAuth, handle((req, res) => {
     const user = req.user as SessionUser;
     const body = z.object({
-      supervisorId: z.string().uuid(),
+      supervisorId: z.string().min(1).max(128),
       reason: z.string().trim().min(10).max(800),
       caseAVersion: z.number().int().positive(),
       caseBVersion: z.number().int().positive(),

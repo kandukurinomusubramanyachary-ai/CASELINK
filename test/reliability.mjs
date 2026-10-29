@@ -143,7 +143,7 @@ test('legacy identity collisions keep both records and flag ambiguous provenance
     WHERE source_reference IS NOT NULL AND source_channel='CSV import'`);
   for (let i = 0; i < 2; i++) db.prepare(`UPDATE cases SET source_channel='CSV import',bureau='PGRC',source_system='Synthetic register',
     source_identity=NULL,source_reference=? WHERE id=?`).run(i ? 'ref-8264' : ' REF-8264 ', ids[i]);
-  db.prepare('DELETE FROM schema_migrations WHERE version=8').run(); db.close();
+  db.prepare('DELETE FROM schema_migrations WHERE version>=8').run(); db.close();
   const migrated = run('server/src/migrate.ts', data);
   assert.equal(migrated.status, 0, migrated.stderr);
   const after = new Database(path.join(data, 'caselink.db'));

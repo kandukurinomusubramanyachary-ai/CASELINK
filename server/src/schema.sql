@@ -332,7 +332,6 @@ CREATE TABLE IF NOT EXISTS jobs (
 );
 CREATE INDEX IF NOT EXISTS jobs_pending_idx ON jobs(state, run_after);
 
-
 -- M3 supervisor review state and immutable action history (separate from complaint history).
 CREATE TABLE IF NOT EXISTS m3_reviews (
   id TEXT PRIMARY KEY,

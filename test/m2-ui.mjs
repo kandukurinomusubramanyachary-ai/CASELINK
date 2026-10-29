@@ -11,7 +11,7 @@ async function login(page) {
   await page.fill('#username','m.nair');
   await page.fill('#password','caselink-demo');
   await page.click('button[type=submit]');
-  await page.waitForSelector('.sidebar',{timeout:15000});
+  await page.locator('#username').waitFor({state:'detached',timeout:15000});
 }
 async function capture(page,label) {
   await page.screenshot({path:OUT + '/' + label + '.png',fullPage:true});

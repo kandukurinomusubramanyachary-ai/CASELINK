@@ -46,7 +46,7 @@ function CandidateCase({ item, title }: { item: M2Candidate['caseA']; title: str
     </dl>
   </Card>;
 }
-export default function OverlapDetectionScreen() {
+export default function OverlapDetectionScreen({ focus }: { focus?: string }) {
   const [view, setView] = useState<View>('queue');
   const [queue, setQueue] = useState<M2Queue | null>(null);
   const [detail, setDetail] = useState<M2Detail | null>(null);
@@ -98,6 +98,8 @@ export default function OverlapDetectionScreen() {
     } catch (e) { setError(e as Error); }
     finally { setBusy(false); }
   }, [focusCaseId]);
+
+  useEffect(() => { if (focus) void openCandidate(focus); }, [focus]);
 
   const selected = detail?.candidate ?? null;
   const otherMatches = useMemo(() => siblings.filter((s) => s.id !== selectedId), [siblings, selectedId]);
