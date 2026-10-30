@@ -1,0 +1,290 @@
+[
+    {
+        "name":  "typecheck",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "build",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "reliability",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "search-access",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "matching-eval",
+        "code":  1,
+        "skipped":  0,
+        "ok":  false
+    },
+    {
+        "name":  "security-m1-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "security-m1",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "security-m1-1-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "security-m1-1",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "security-m2-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "security-m2",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "m2-api-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "m2-api",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "m2-ui-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "m2-ui",
+        "code":  1,
+        "skipped":  0,
+        "ok":  false
+    },
+    {
+        "name":  "m3-supervisor-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "m3-supervisor",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "m3-ui-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "m3-ui",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "m4-relationship-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "m4-relationship",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "m4-ui-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "m4-ui",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "lifecycle-m3-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "lifecycle-m3",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "concurrency-m4-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "concurrency-m4",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "import-m5-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "import-m5",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "migration-check",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "audit-m7-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "audit-m7",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "acceptance-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "acceptance",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "login-check-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "login-check",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "ui-smoke-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "ui-smoke",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "acceptance-ui-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "acceptance-ui",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "refresh-m6-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "refresh-m6",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "ux-m7-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "ux-m7",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "demo-mode-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "demo-mode",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "direct-entry-seed",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    },
+    {
+        "name":  "direct-entry",
+        "code":  0,
+        "skipped":  0,
+        "ok":  true
+    }
+]

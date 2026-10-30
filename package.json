@@ -19,6 +19,7 @@
     "setup": "bash start.sh --setup-only",
     "bootstrap:admin": "node --import tsx server/src/bootstrap-admin.ts",
     "test:reliability": "node --test test/reliability.mjs",
+    "test:integration": "node test/m2-m3-m4-integration.mjs",
     "verify": "node test/verify.mjs",
     "test:direct": "node test/direct-entry.mjs",
     "test:security": "node test/security-m1.mjs",

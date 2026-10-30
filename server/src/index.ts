@@ -2750,6 +2750,7 @@ if (reconciled.completed || reconciled.rolledBack || reconciled.orphanFiles) {
 }
 startWorker();
 const port = Number(process.env.PORT ?? 8080);
-app.listen(port, '0.0.0.0', () => {
-  console.log(`CaseLink listening on http://0.0.0.0:${port} (demo=${DEMO_MODE}, data=${DATA_DIR}, seeded=${seeded})`);
+const host = process.env.CASELINK_HOST ?? '127.0.0.1';
+app.listen(port, host, () => {
+  console.log(`CaseLink listening on http://${host}:${port} (demo=${DEMO_MODE}, data=${DATA_DIR}, seeded=${seeded})`);
 });

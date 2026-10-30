@@ -177,7 +177,7 @@ export default function OverlapDetectionScreen({ focus }: { focus?: string }) {
             <td><b>{name(s.caseB)}</b><small>{s.caseB.category}</small></td>
             <td><span>{s.caseA.institutionName}</span><small>{s.caseA.institutionPermanentId}</small></td>
             <td><Signal candidate={s} /></td>
-            <td><Pill tone={s.handoffCount ? 'blue' : s.state === 'open' ? 'amber' : 'slate'}>{s.handoffCount ? 'Sent for review' : s.state === 'open' ? 'New suggestion' : s.state}</Pill></td>
+            <td><Pill tone={s.handoffCount ? 'blue' : s.state === 'open' ? 'amber' : 'slate'}>{s.state === 'accepted' ? 'Relationship confirmed' : s.state === 'outdated' ? 'Outdated' : s.handoffCount ? 'Sent for review' : s.state === 'open' ? 'New suggestion' : s.state}</Pill></td>
             <td><button className="m2-action" disabled={busy} onClick={() => void openCandidate(s.id)}>Inspect →</button></td>
           </tr>)}</tbody>
         </table></div>}
