@@ -27,7 +27,7 @@ async function server(t, data, demo = false) {
     listener.listen(0, '127.0.0.1', () => { const selected = listener.address().port; listener.close(() => resolve(selected)); });
   });
   const child = spawn(process.execPath, ['--import', 'tsx', 'server/src/index.ts'], {
-    cwd: repo, env: { ...process.env, CASELINK_DATA_DIR: data, CASELINK_DEMO: String(demo), CASELINK_TEST_HOOKS: 'false', PORT: String(port) },
+    cwd: repo, env: { ...process.env, CASELINK_DATA_DIR: data, CASELINK_HOST: '127.0.0.1', CASELINK_DEMO: String(demo), CASELINK_TEST_HOOKS: 'false', PORT: String(port) },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   child.stdout.on('data', value => { output += value; });
@@ -39,7 +39,7 @@ async function server(t, data, demo = false) {
   };
   t.after(stop);
   const deadline = Date.now() + 15_000;
-  while (!/listening on http:\/\/0\.0\.0\.0:\d+/.test(output)) {
+  while (!/listening on http:\/\/127\.0\.0\.1:\d+/.test(output)) {
     if (child.exitCode !== null || Date.now() > deadline) throw new Error(`Server did not start: ${output}`);
     await new Promise(resolve => setTimeout(resolve, 30));
   }
@@ -77,6 +77,32 @@ test('release gate rejects explicit, disguised, TAP and summary-only skipped che
     'executed: 1   passed: 1   failed: 0   skipped: 0',
   ];
   for (const output of legitimateOutputs) assert.equal(countRequiredSkips(output), 0, output);
+});
+
+test('v8 upgrade creates migrations 9–11, constraints and immutable audit triggers without changing cases', () => {
+  const data = dir('m2-m3-m4-upgrade');
+  seed(data);
+  const db = new Database(path.join(data, 'caselink.db'));
+  const before = db.prepare('SELECT id,version,complaint_summary,status FROM cases ORDER BY id').all();
+  for (const table of ['m4_idempotency','m4_decision_events','m4_drafts','m4_decisions',
+    'm3_review_events','m3_reviews','m2_review_handoffs']) db.exec(`DROP TABLE ${table}`);
+  db.exec('DELETE FROM schema_migrations WHERE version >= 9');
+  db.close();
+  const migrated = run('server/src/migrate.ts', data);
+  assert.equal(migrated.status, 0, migrated.stderr);
+  const after = new Database(path.join(data, 'caselink.db'));
+  assert.deepEqual(after.prepare('SELECT id,version,complaint_summary,status FROM cases ORDER BY id').all(), before);
+  assert.deepEqual(after.prepare('SELECT version FROM schema_migrations WHERE version >= 9 ORDER BY version').all(),
+    [{ version: 9 }, { version: 10 }, { version: 11 }]);
+  for (const name of ['m2_review_handoffs','m3_reviews','m3_review_events','m4_drafts','m4_decisions',
+    'm4_decision_events','m4_idempotency','m4_one_active_pair','m4_events_no_update','m4_events_no_delete']) {
+    assert.ok(after.prepare('SELECT name FROM sqlite_master WHERE name=?').get(name), name);
+  }
+  assert.deepEqual(after.prepare('PRAGMA foreign_key_check').all(), []);
+  after.close();
+  const repeat = run('server/src/migrate.ts', data);
+  assert.equal(repeat.status, 0, repeat.stderr);
+  assert.match(repeat.stdout, /applied: none/);
 });
 
 test('normal boot creates no fixture accounts and bootstrap uses unique credentials', async t => {

@@ -79,6 +79,10 @@ try {
   await command('reliability', ['--test', 'test/reliability.mjs']);
   await command('search-access', ['test/search-access.mjs']);
   await command('matching-eval', ['--import', 'tsx', 'test/matching-eval.ts']);
+  await command('m2-m3-m4-integration', ['test/m2-m3-m4-integration.mjs'], {
+    CASELINK_INTEGRATION_DIR: path.join(output, 'integration'),
+    CASELINK_SCREENSHOT_DIR: path.join(output, 'screenshots'),
+  });
   for (const file of ['security-m1', 'security-m1-1', 'security-m2', 'm2-api', 'm2-ui', 'm3-supervisor', 'm3-ui', 'm4-relationship', 'm4-ui', 'lifecycle-m3', 'concurrency-m4', 'import-m5', 'audit-m7', 'acceptance', 'login-check', 'ui-smoke', 'acceptance-ui', 'refresh-m6', 'ux-m7']) {
     await apiSuite(`test/${file}.mjs`);
   }

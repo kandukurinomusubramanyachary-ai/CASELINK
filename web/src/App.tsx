@@ -579,14 +579,14 @@ function RouteView({ match }: { route: string; match: ReturnType<typeof matchRou
     case 'case':
       return <CaseWorkspace id={match.param!} />;
     case 'overlaps':
-      return <OverlapDetectionScreen focus={match.param} />;
+      return <OverlapDetectionScreen key={match.param ?? 'queue'} focus={match.param} />;
     case 'coordination':
     case 'coordination-focus':
       return <CoordinationScreen focus={match.param} />;
     case 'supervisor-review':
-      return <SupervisorReviewScreen focus={match.param} />;
+      return <SupervisorReviewScreen key={match.param ?? 'queue'} focus={match.param} />;
     case 'relationship-decision':
-      return <RelationshipDecisionScreen id={match.param!} />;
+      return <RelationshipDecisionScreen key={match.param} id={match.param!} />;
     case 'alerts':
       return <AlertsScreen />;
     case 'reports':

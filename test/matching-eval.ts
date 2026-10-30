@@ -25,7 +25,7 @@ import { spawnSync } from 'node:child_process';
 const FREEZE = process.argv.includes('--freeze');
 const SWEEP = process.argv.includes('--sweep');
 const TUNE_ONLY = process.argv.includes('--tune-only');
-const repo = path.resolve(new URL('..', import.meta.url).pathname);
+const repo = path.resolve(import.meta.dirname, '..');
 const fixturePath = path.join(repo, 'test/fixtures/matching-set.json');
 const SET_VERSION = 'm6-matching-1';
 
@@ -404,5 +404,6 @@ const pass =
 
 console.log(`\n  result: ${pass ? 'PASS' : 'FAIL'} — set integrity, exact-ID overlap and the cross-institution negative control ${pass ? 'hold' : 'do not hold'}.`);
 console.log('  Note: precision/recall above are measured on this synthetic set. The PRD 90% precision / 80% recall figures are a P1 target, not a measured result.');
+db.close();
 fs.rmSync(dataDir, { recursive: true, force: true });
 process.exit(pass ? 0 : 1);

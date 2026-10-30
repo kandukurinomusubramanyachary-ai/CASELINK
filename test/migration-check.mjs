@@ -20,7 +20,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import Database from 'better-sqlite3';
 
-const repo = path.resolve(new URL('..', import.meta.url).pathname);
+const repo = path.resolve(import.meta.dirname, '..');
 const source = path.resolve(process.argv[2] ?? path.join(repo, 'data/caselink.db'));
 const simulatePreM3 = process.argv.includes('--simulate-pre-m3');
 

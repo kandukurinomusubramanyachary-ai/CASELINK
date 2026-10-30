@@ -9,8 +9,8 @@ const BASE=process.env.BASE??'http://127.0.0.1:8080';
 async function api(method,route,token,body){
   const res=await fetch(BASE+'/api'+route,{method,headers:{
     ...(token?{Authorization:'Bearer '+token}:{}),
-    ...(body?{'Content-Type':'application/json'}:{}),
-  },body:body?JSON.stringify(body):undefined});
+    ...(body && !(body instanceof FormData)?{'Content-Type':'application/json'}:{}),
+  },body:body instanceof FormData?body:body?JSON.stringify(body):undefined});
   const data=await res.json().catch(()=>null);
   if(res.status>=400)throw new Error(method+' '+route+' -> '+res.status+' '+JSON.stringify(data));
   return data;
@@ -38,6 +38,11 @@ for(const [i,summary] of summaries.entries()){
     version:c.version,userId:'u-supervisor',
     note:'Synthetic M3/M4 manual preview: explicit content-read authorization.',
   });
+  const current=await api('GET','/cases/'+c.id,lead.token);
+  const proof=new FormData();
+  proof.append('version',String(current.case.version));
+  proof.append('file',new Blob([Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Ya8VV4AAAAASUVORK5CYII=','base64')],{type:'image/png'}),'synthetic-inspection-'+i+'.png');
+  await api('POST','/cases/'+c.id+'/attachments',lead.token,proof);
 }
 let pair=null;
 for(let attempt=0;attempt<100;attempt++){
@@ -48,6 +53,14 @@ for(let attempt=0;attempt<100;attempt++){
   await new Promise(resolve=>setTimeout(resolve,300));
 }
 assert.ok(pair,'M2 did not generate a matching pair. Review the M2 worker and server logs.');
+if(process.argv.includes('--prepare-only')){
+  console.log('Synthetic M2 fixture ready. No handoff, review or relationship decision has been made.');
+  console.log('Bureau lead: m.nair / caselink-demo; supervisor: a.desai / caselink-demo');
+  console.log('Case A:',pair.caseA.caseNumber,'Case B:',pair.caseB.caseNumber);
+  console.log('M2:',new URL(BASE).origin+'/#/overlaps/'+pair.id);
+  console.log('Both complaints have private synthetic PNG evidence and explicit supervisor content grants.');
+  process.exit(0);
+}
 const handoff=await api('POST','/m2/suggestions/'+pair.id+'/handoff',lead.token,{
   supervisorId:'u-supervisor',
   reason:'Inspect both synthetic hostel water-supply grievances and determine their relationship.',
