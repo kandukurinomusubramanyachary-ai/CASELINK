@@ -1,0 +1,12 @@
+Disposable fixture verification; this port 8187 server was stopped after the run.
+
+Synthetic CASELINK M3/M4 fixture created. No decisions were made.
+Case A: PGRC-2026-00040 Case B: PGRC-2026-00041
+Supervisor login: a.desai / caselink-demo
+Bureau lead login: m.nair / caselink-demo
+M3 review: http://127.0.0.1:8187/#/supervisor-review/3ec20c33-2d84-4c64-ad00-7f1df7ad771e
+M4 decision (after M3 acceptance): http://127.0.0.1:8187/#/relationship-decision/3ec20c33-2d84-4c64-ad00-7f1df7ad771e
+Try Request More Evidence in M3, then view the bureau lead's Notifications inbox.
+Never run this fixture against production or real complaint data.
+
+
